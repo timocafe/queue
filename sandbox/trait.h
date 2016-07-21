@@ -28,7 +28,7 @@ struct helper_type<priority_queue>{
 
 template<>
 struct helper_type<spltree>{
-    typedef TQueue<double, std::greater<double>> queue_type;
+    typedef sptq::TQueue<double, std::greater<double>> queue_type;
 };
 
 template<>

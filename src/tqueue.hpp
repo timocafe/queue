@@ -26,7 +26,6 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 #ifndef tqueue_hpp_
 #define tqueue_hpp_
 
@@ -38,7 +37,11 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "tqueue.h"
 
-/** The queue: TQeue from Michael starts here, not compliant with std for the container */
+namespace sptq {
+/** The queue: TQeue from Michael starts here, not compliant with std for the container,
+but ok for the type support and the comparator, by default std::less and not std::greated
+as it was in the original version */
+
 template<class T = double, class Compare = std::less<T>>
 class TQueue {
 public:
@@ -61,7 +64,7 @@ public:
         sptq::spenq(n, &q);
         s++;
     }
-    
+
     inline void pop(){
         if(!empty()){
             sptq::node<T,Compare> *n = sptq::spdeq(&(&q)->root);
@@ -71,7 +74,10 @@ public:
     }
 
     inline value_type top(){
-        return sptq::sphead<T,Compare>(&q)->key();
+        value_type tmp = value_type();
+        if(!empty())
+            tmp = sptq::sphead<T,Compare>(&q)->key();
+        return tmp;
     }
 
     inline size_type size(){
@@ -81,14 +87,14 @@ public:
     inline bool empty(){
         return !bool(s); // is it true on Power?
     }
-    
+
     void print(std::ostream &os) {
         while(!empty()){
             os << top() << std::endl;
             pop();
         }
     }
-    
+
 private:
     size_type s;
     container q;
@@ -100,6 +106,7 @@ std::ostream& operator<< (std::ostream& os, TQueue<T,Compare>& q ){
     return os;
 }
 
+} // end namespace
 #include "tqueue.ipp"
 
 #endif
