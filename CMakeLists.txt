@@ -1,0 +1,6 @@
+cmake_minimum_required (VERSION 2.8.12)
+project (queue)
+find_package(Boost 1.49)
+include_directories(${Boost_INCLUDE_DIRS})
+add_compile_options(-std=c++11)
+add_executable(queue  main.cpp)
