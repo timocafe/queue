@@ -82,6 +82,14 @@ Hines changed to void spinit(SPTREE**) for use with TQueue.
  * Thu Oct  6 12:11:33 PDT 1988 (daveb) Fixed spdeq, which was broken
  *	handling one-node trees.  I botched the pascal translation of
  *	a VAR parameter.
+ *
+ * July 2016 - Tim Ewart - timothee.ewart@gmail.com
+ *  - namespace stdq instead of C style signature
+ *  - Remove all macros
+ *  - Item becomes node
+ *  - Introduce generacity for the value of the node and integrate the template argumenent comparator
+ *    to respect the std::API
+ *  - Introduce object function to select the good comparator for std::less and std::greater
  */
 
 /** first a bit of trait class */
