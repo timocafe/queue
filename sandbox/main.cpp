@@ -101,11 +101,10 @@ namespace queue{
 } // end name space
 
 int main(int argc, char* argv[]){
-   int iteration = std::atoi(argv[1]);
+    int iteration = std::atoi(argv[1]);
 
-   queue::benchmark_push(iteration);
-   queue::benchmark_pop(iteration);
-
+    queue::benchmark_push(iteration);
+    queue::benchmark_pop(iteration);
 
     return 0;
 }
