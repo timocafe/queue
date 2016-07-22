@@ -100,6 +100,7 @@ private:
     container q;
 };
 
+// carefull the << delete the queue only for debugging 
 template<class T, class Compare>
 std::ostream& operator<< (std::ostream& os, TQueue<T,Compare>& q ){
     q.print(os);

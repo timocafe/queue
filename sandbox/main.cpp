@@ -57,7 +57,7 @@ namespace queue{
 
 
     void benchmark_push(int iteration){
-        int size(128);
+        int size(1);
         std::list<std::string> res;
         res.push_back("#elements,std::priority_queue,mh_splay,boost::binomial_heap,boost::fibonacci_heap,boost::pairing_heap,boost::skew_heap \n");
 
@@ -79,7 +79,7 @@ namespace queue{
 
 
     void benchmark_pop(int iteration){
-        int size(128);
+        int size(1);
         std::list<std::string> res;
         res.push_back("#elements,std::priority_queue,mh_splay,boost::binomial_heap,boost::fibonacci_heap,boost::pairing_heap,boost::skew_heap \n");
 
@@ -101,7 +101,7 @@ namespace queue{
 } // end name space
 
 int main(int argc, char* argv[]){
-   int iteration = atoi(argv[1]);
+   int iteration = std::atoi(argv[1]);
 
    queue::benchmark_push(iteration);
    queue::benchmark_pop(iteration);
