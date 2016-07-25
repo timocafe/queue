@@ -1,0 +1,2 @@
+#elements,std::priority_queue,mh_splay,boost::binomial_heap,boost::fibonacci_heap,boost::pairing_heap,boost::skew_heap 
+100000,179.800000,1263.100000,3621.700000,402.500000,443.500000,699.100000
