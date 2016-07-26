@@ -43,7 +43,7 @@ struct benchmark_helper;
 template<class F, class D>
 struct benchmark_helper<F,D>{
     static std::string benchmark(int size){
-        return (std::to_string(F::template benchmark<D>(size)));
+        return (std::to_string(F::template benchmark<D>(size))); //execute the bench here
     }
 };
 

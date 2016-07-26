@@ -94,11 +94,11 @@ namespace queue{
         int size(1);
         std::list<std::string> res;
 
-        res.push_back("#elements,"+name_helper<T...>::name()+"\n");
+        res.push_back("#elements," + name_helper<T...>::name() + "\n");
 
         for(int i=1; i< iteration; ++i){
             std::string results = std::to_string(size) + ",";
-            results += benchmark_helper<F,T...>::benchmark(size)+"\n";
+            results += benchmark_helper<F,T...>::benchmark(size) + "\n";
             res.push_back(results);
             size<<=1; // 1,2,4,8 ....
         }
