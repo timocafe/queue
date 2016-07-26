@@ -31,7 +31,6 @@ namespace queue{
                 t2 = rdtsc();
                 time += (t2 - t1);
             }
-
             return time*0.1;
         }
 
@@ -65,8 +64,8 @@ namespace queue{
     };
 
     struct push_one_helper{
-            template<class T>
-            static double benchmark(int size){
+        template<class T>
+        static double benchmark(int size){
             using value_type = typename T::value_type;
             unsigned long long int t1(0),t2(0),time(0);
             std::default_random_engine generator;
@@ -82,7 +81,6 @@ namespace queue{
                 t2 = rdtsc();
                 time += (t2 - t1);
             }
-
             return time*0.1;
         }
 
