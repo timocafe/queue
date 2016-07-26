@@ -22,7 +22,7 @@ before_script:
   - cmake -DQUEUE_TESTS=on ..
 script:
   - make
-  - make test
+  - ctest
 notifications:
   email:
     recipients:
