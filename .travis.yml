@@ -22,7 +22,7 @@ addons:
     - g++-4.8
     - clang
     - libboost-all-dev
-    - cmake-all-dev
+    - cmake-3.3
 before_script:
   - mkdir build
   - cd build
