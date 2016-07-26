@@ -50,7 +50,7 @@ public:
     typedef T value_type;
 
     inline TQueue():s(0) {
-        sptq::spinit((&q));
+        sptq::spinit(&q);
     }
 
     inline ~TQueue(){
@@ -74,10 +74,7 @@ public:
     }
 
     inline value_type top(){
-        value_type tmp;
-        if(!empty())
-            tmp = sptq::sphead<T,Compare>(&q)->key();
-        return tmp;
+        return sptq::sphead<T,Compare>(&q)->key();
     }
 
     inline size_type size(){
