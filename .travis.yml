@@ -6,8 +6,8 @@
 # @author Tim Ewart
 #
 
+sudo: required
 dist: trusty
-sudo: false
 language: cpp
 compiler:
   - gcc
@@ -15,9 +15,7 @@ compiler:
 addons:
   apt:
     packages:
-    - clang
     - libboost-all-dev
-    - cmake
 before_script:
   - mkdir build
   - cd build
