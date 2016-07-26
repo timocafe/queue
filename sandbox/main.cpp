@@ -31,7 +31,7 @@ namespace queue{
                 t2 = rdtsc();
                 time += (t2 - t1);
             }
-            return time*1/repetition;
+            return time*1./repetition;
         }
 
         constexpr static auto name = "push";
@@ -57,7 +57,7 @@ namespace queue{
 
                 time += (t2 - t1);
             }
-            return time*1/repetition;
+            return time*1./repetition;
         }
 
         constexpr static auto name = "pop";
@@ -81,7 +81,7 @@ namespace queue{
                 t2 = rdtsc();
                 time += (t2 - t1);
             }
-            return time*1/repetition;
+            return time*1./repetition;
         }
 
         constexpr static auto name = "push_one";
