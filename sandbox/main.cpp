@@ -17,21 +17,21 @@ namespace queue{
 
     struct push_helper{
         template<class T>
-        static double benchmark(int size){
+        static double benchmark(int size, int repetition){
             using value_type = typename T::value_type;
             std::default_random_engine generator;
             std::uniform_real_distribution<double> distribution(0.0,1.0);
             unsigned long long int t1(0),t2(0),time(0);
 
-            for(int j=0; j<10;++j){
+            for(int j=0; j<repetition; ++j){
                 value_type queue;
                 t1 = rdtsc();
-                    for(int i = 0; i < size ; ++i)
-                        queue.push(distribution(generator));
+                for(int i = 0; i < size ; ++i)
+                    queue.push(distribution(generator));
                 t2 = rdtsc();
                 time += (t2 - t1);
             }
-            return time*0.1;
+            return time*1/repetition;
         }
 
         constexpr static auto name = "push";
@@ -39,13 +39,13 @@ namespace queue{
 
     struct pop_helper{
         template<class T>
-        static double benchmark(int size){
+        static double benchmark(int size, int repetition){
             using value_type = typename T::value_type;
             std::default_random_engine generator;
             std::uniform_real_distribution<double> distribution(0.0,1.0);
             unsigned long long int t1(0),t2(0),time(0);
 
-            for(int j=0; j<10;++j){
+            for(int j=0; j<repetition; ++j){
                 value_type queue;
                 for(int i = 0; i < size ; ++i)
                     queue.push(distribution(generator));
@@ -57,7 +57,7 @@ namespace queue{
 
                 time += (t2 - t1);
             }
-            return  time*0.1;
+            return time*1/repetition;
         }
 
         constexpr static auto name = "pop";
@@ -65,13 +65,13 @@ namespace queue{
 
     struct push_one_helper{
         template<class T>
-        static double benchmark(int size){
+        static double benchmark(int size, int repetition){
             using value_type = typename T::value_type;
             unsigned long long int t1(0),t2(0),time(0);
             std::default_random_engine generator;
             std::uniform_real_distribution<double> distribution(0.0,1.0);
 
-            for(int j=0; j<10;++j){
+            for(int j=0; j<repetition; ++j){
                 value_type queue;
                 for(int i = 0; i < size ; ++i)
                     queue.push(distribution(generator));
@@ -81,29 +81,26 @@ namespace queue{
                 t2 = rdtsc();
                 time += (t2 - t1);
             }
-            return time*0.1;
+            return time*1/repetition;
         }
 
         constexpr static auto name = "push_one";
     };
 
     template<class F, class ...T>
-    void benchmark(int iteration){
-        int size(1);
-        std::list<std::string> res;
-
-        res.push_back("#elements," + name_helper<T...>::name() + "\n");
+    void benchmark(int iteration, int size = 1, int repetition = 10){
+        
+        std::list<std::string> res(1,"#elements," + name_helper<T...>::name() + "\n");
 
         for(int i=1; i< iteration; ++i){
             std::string results = std::to_string(size) + ",";
-            results += benchmark_helper<F,T...>::benchmark(size) + "\n";
+            results += benchmark_helper<F,T...>::benchmark(size,repetition) + "\n";
             res.push_back(results);
             size<<=1; // 1,2,4,8 ....
         }
         //start IO
         std::fstream out;
-        std::string name = std::string(F::name) + ".csv";
-        out.open(name,std::fstream::out);
+        out.open(std::string(F::name) + ".csv",std::fstream::out);
         std::copy(res.begin(),res.end(), std::ostream_iterator<std::string>(out));
     }
 } // end name space
