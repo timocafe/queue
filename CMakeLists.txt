@@ -4,8 +4,12 @@ find_package(Boost 1.49 REQUIRED unit_test_framework)
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(src)
 
-include(CTest)
-enable_testing()
+option (QUEUE_TESTS "Build the regression tests" OFF)
 
-add_subdirectory(test)
+if(QUEUE_TESTS)
+    include(CTest)
+    enable_testing()
+    add_subdirectory(test)
+endif(QUEUE_TESTS)
+
 add_subdirectory(sandbox)
