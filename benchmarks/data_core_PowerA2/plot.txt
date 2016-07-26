@@ -1,7 +1,7 @@
 
 reset
 set terminal postscript eps enhanced color
-set size 0.70,0.6
+set size 0.6,0.6
 set key bot right vertical
 
 set xrange [1:100000]
