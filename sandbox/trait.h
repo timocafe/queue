@@ -50,7 +50,8 @@ struct benchmark_helper<F,D>{
 template<class F, class D, class ...T>
 struct benchmark_helper{
     static std::string benchmark(int size, int repetition){
-        return benchmark_helper<F,D>::benchmark(size,repetition)+","+benchmark_helper<F,T...>::benchmark(size,repetition);
+        return benchmark_helper<F,D>::benchmark(size,repetition)+","
+                +benchmark_helper<F,T...>::benchmark(size,repetition);
     }
 };
 

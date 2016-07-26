@@ -74,7 +74,7 @@ public:
     }
 
     inline value_type top(){
-        value_type tmp;
+        value_type tmp = value_type();
         if(!empty())
             tmp = sptq::sphead<T,Compare>(&q)->key();
         return tmp;
