@@ -106,7 +106,7 @@ namespace queue{
 } // end name space
 
 int main(int argc, char* argv[]){
-    int size = std::atoi(argv[1]);
+    int iteration = std::atoi(argv[1]);
     //queue types
     using t0 = helper_type<priority_queue>;
     using t1 = helper_type<spltree>;
@@ -119,9 +119,9 @@ int main(int argc, char* argv[]){
     using pop = queue::pop_helper;
     using push_one = queue::push_one_helper;
     //benchmarks
-    queue::benchmark<push,t0,t1,t2,t3,t4,t5>(size);
-    queue::benchmark<pop,t0,t1,t2,t3,t4,t5>(size);
-    queue::benchmark<push_one,t0,t1,t2,t3,t4,t5>(size);
+    queue::benchmark<push,t0,t1,t2,t3,t4,t5>(iteration);
+    queue::benchmark<pop,t0,t1,t2,t3,t4,t5>(iteration);
+    queue::benchmark<push_one,t0,t1,t2,t3,t4,t5>(iteration);
 
     return 0;
 }
