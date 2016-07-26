@@ -54,7 +54,6 @@ struct benchmark_helper{
     }
 };
 
-
 template<container q>
 struct helper_type;
 
