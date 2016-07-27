@@ -16,7 +16,7 @@
 #include <boost/heap/pairing_heap.hpp>
 #include <boost/heap/skew_heap.hpp>
 
-enum container {spltree, priority_queue,binomial_heap,fibonacci_heap,pairing_heap,skew_heap};
+enum container {spltree, priority_queue,binomial_heap,fibonacci_heap,pairing_heap,skew_heap,d_ary_heap};
 
 //name helper printer
 template<class D, class... T>
@@ -93,5 +93,13 @@ struct helper_type<skew_heap>{
     typedef boost::heap::skew_heap<double, boost::heap::compare<std::greater<double>>> value_type;
     constexpr static auto name = "boost::skew_heap";
 };
+
+
+template<>
+struct helper_type<d_ary_heap>{
+    typedef boost::heap::d_ary_heap<double,boost::heap::arity<128>, boost::heap::compare<std::greater<double>>> value_type;
+    constexpr static auto name = "boost::d_ary_heap";
+};
+
 
 #endif /* trait_h */

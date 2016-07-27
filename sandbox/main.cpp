@@ -27,18 +27,21 @@ namespace queue{
             const double dt = 0.025;
             const double max_time = 50.0;
 
-	    for(auto t=0.0; t < max_time; t += dt){
-		value_type queue;
-		t1 = rdtsc();
-		for(int i = 0; i < size ; ++i)
-		    queue.push(t + distribution(generator));
-		while ( queue.top() <= t)
-		    queue.pop();
+            for(int j=0; j<repetition; ++j){
+                for(auto t=0.0; t < max_time; t += dt){
+                    value_type queue;
+                    t1 = rdtsc();
+                    for(int i = 0; i < size ; ++i)
+                        queue.push(t + distribution(generator));
 
-		t += dt;
-		t2 = rdtsc();
-		time += (t2 - t1);
-	    }
+                    while ( queue.top() <= t)
+                        queue.pop();
+
+                    t += dt;
+                    t2 = rdtsc();
+                    time += (t2 - t1);
+                }
+            }
             return time*1/static_cast<double>(repetition);
         }
 
@@ -145,17 +148,18 @@ int main(int argc, char* argv[]){
     using t3 = helper_type<fibonacci_heap>;
     using t4 = helper_type<pairing_heap>;
     using t5 = helper_type<skew_heap>;
+    using t6 = helper_type<d_ary_heap>;
     //bench types
     using push = queue::push_helper;
     using pop = queue::pop_helper;
     using push_one = queue::push_one_helper;
     using mh = queue::mhines_bench_helper;
     //benchmarks
-    queue::benchmark<push,t0,t1,t2,t3,t4,t5>(iteration);
-    queue::benchmark<pop,t0,t1,t2,t3,t4,t5>(iteration);
-    queue::benchmark<push_one,t0,t1,t2,t3,t4,t5>(iteration);
-    queue::benchmark<push_one,t0,t1,t2,t3,t4,t5>(iteration);
-    queue::benchmark<mh,t0,t1,t2,t3,t4,t5>(iteration);
+    queue::benchmark<push,t0,t1,t2,t3,t4,t5,t6>(iteration);
+    queue::benchmark<pop,t0,t1,t2,t3,t4,t5,t6>(iteration);
+    queue::benchmark<push_one,t0,t1,t2,t3,t4,t5,t6>(iteration);
+    queue::benchmark<push_one,t0,t1,t2,t3,t4,t5,t6>(iteration);
+    queue::benchmark<mh,t0,t1,t2,t3,t4,t5,t6>(iteration);
 
     return 0;
 }
