@@ -15,6 +15,36 @@
 
 namespace queue{
 
+    struct mhines_bench_helper {
+        template<class T>
+        static double benchmark(int size, int repetition){
+            repetition=1;
+            using value_type = typename T::value_type;
+            std::default_random_engine generator;
+            std::uniform_real_distribution<double> distribution(0.5,2.0);
+            unsigned long long int t1(0),t2(0),time(0);
+
+            const double dt = 0.025;
+            const double max_time = 50.0;
+
+	    for(auto t=0.0; t < max_time; t += dt){
+		value_type queue;
+		t1 = rdtsc();
+		for(int i = 0; i < size ; ++i)
+		    queue.push(t + distribution(generator));
+		while ( queue.top() <= t)
+		    queue.pop();
+
+		t += dt;
+		t2 = rdtsc();
+		time += (t2 - t1);
+	    }
+            return time*1/static_cast<double>(repetition);
+        }
+
+        constexpr static auto name = "mh";
+    };
+
     struct push_helper{
         template<class T>
         static double benchmark(int size, int repetition){
@@ -89,7 +119,7 @@ namespace queue{
 
     template<class F, class ...T>
     void benchmark(int iteration, int size = 1, int repetition = 10){
-        
+
         std::list<std::string> res(1,"#elements," + name_helper<T...>::name() + "\n");
 
         for(int i=1; i< iteration; ++i){
@@ -119,10 +149,13 @@ int main(int argc, char* argv[]){
     using push = queue::push_helper;
     using pop = queue::pop_helper;
     using push_one = queue::push_one_helper;
+    using mh = queue::mhines_bench_helper;
     //benchmarks
     queue::benchmark<push,t0,t1,t2,t3,t4,t5>(iteration);
     queue::benchmark<pop,t0,t1,t2,t3,t4,t5>(iteration);
     queue::benchmark<push_one,t0,t1,t2,t3,t4,t5>(iteration);
+    queue::benchmark<push_one,t0,t1,t2,t3,t4,t5>(iteration);
+    queue::benchmark<mh,t0,t1,t2,t3,t4,t5>(iteration);
 
     return 0;
 }
