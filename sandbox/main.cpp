@@ -31,7 +31,7 @@ namespace queue{
                 t2 = rdtsc();
                 time += (t2 - t1);
             }
-            return time*1./repetition;
+            return time*1/static_cast<double>(repetition);
         }
 
         constexpr static auto name = "push";
@@ -57,7 +57,7 @@ namespace queue{
 
                 time += (t2 - t1);
             }
-            return time*1./repetition;
+            return time*1/static_cast<double>(repetition);
         }
 
         constexpr static auto name = "pop";
@@ -81,7 +81,7 @@ namespace queue{
                 t2 = rdtsc();
                 time += (t2 - t1);
             }
-            return time*1./repetition;
+            return time*1/static_cast<double>(repetition);
         }
 
         constexpr static auto name = "push_one";
@@ -106,6 +106,7 @@ namespace queue{
 } // end name space
 
 int main(int argc, char* argv[]){
+
     int iteration = std::atoi(argv[1]);
     //queue types
     using t0 = helper_type<priority_queue>;

@@ -74,7 +74,10 @@ public:
     }
 
     inline value_type top(){
-        return sptq::sphead<T,Compare>(&q)->key();
+        value_type tmp = value_type();
+        if(!empty())
+            tmp = sptq::sphead<T,Compare>(&q)->key();
+        return tmp;
     }
 
     inline size_type size(){
