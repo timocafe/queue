@@ -97,7 +97,7 @@ struct helper_type<skew_heap>{
 
 template<>
 struct helper_type<d_ary_heap>{
-    typedef boost::heap::d_ary_heap<double,boost::heap::arity<128>, boost::heap::compare<std::greater<double>>> value_type;
+    typedef boost::heap::d_ary_heap<double,boost::heap::arity<16>, boost::heap::compare<std::greater<double>>> value_type;
     constexpr static auto name = "boost::d_ary_heap";
 };
 
