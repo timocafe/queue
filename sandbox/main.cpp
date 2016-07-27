@@ -17,7 +17,7 @@ namespace queue{
 
     struct mhines_bench_helper {
         template<class T>
-        static double benchmark(int size, int repetition){
+        static double benchmark(int size, int repetition = 2){
             repetition=1;
             using value_type = typename T::value_type;
             std::default_random_engine generator;
@@ -50,7 +50,7 @@ namespace queue{
 
     struct push_helper{
         template<class T>
-        static double benchmark(int size, int repetition){
+        static double benchmark(int size, int repetition = 10){
             using value_type = typename T::value_type;
             std::default_random_engine generator;
             std::uniform_real_distribution<double> distribution(0.0,1.0);
@@ -72,7 +72,7 @@ namespace queue{
 
     struct pop_helper{
         template<class T>
-        static double benchmark(int size, int repetition){
+        static double benchmark(int size, int repetition = 10){
             using value_type = typename T::value_type;
             std::default_random_engine generator;
             std::uniform_real_distribution<double> distribution(0.0,1.0);
@@ -98,7 +98,7 @@ namespace queue{
 
     struct push_one_helper{
         template<class T>
-        static double benchmark(int size, int repetition){
+        static double benchmark(int size, int repetition = 10){
             using value_type = typename T::value_type;
             unsigned long long int t1(0),t2(0),time(0);
             std::default_random_engine generator;
@@ -121,13 +121,13 @@ namespace queue{
     };
 
     template<class F, class ...T>
-    void benchmark(int iteration, int size = 1, int repetition = 10){
+    void benchmark(int iteration, int size = 1){
 
         std::list<std::string> res(1,"#elements," + name_helper<T...>::name() + "\n");
 
         for(int i=1; i< iteration; ++i){
             std::string results = std::to_string(size) + ",";
-            results += benchmark_helper<F,T...>::benchmark(size,repetition) + "\n";
+            results += benchmark_helper<F,T...>::benchmark(size) + "\n";
             res.push_back(results);
             size<<=1; // 1,2,4,8 ....
         }
@@ -138,8 +138,8 @@ namespace queue{
     }
 } // end name space
 
-int main(int argc, char* argv[]){
 
+int main(int argc, char* argv[]){
     int iteration = std::atoi(argv[1]);
     //queue types
     using t0 = helper_type<priority_queue>;
