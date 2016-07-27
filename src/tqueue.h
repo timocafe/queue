@@ -28,7 +28,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace sptq { // namespace si better than C style
 
-template<class T, class Compare >
+template<class T>
 struct node {
     typedef T value_type;
 
@@ -41,27 +41,27 @@ struct node {
 	node* parent_;
 };
 
-template<class T, class Compare>
+template<class T>
 struct SPTREE{
-    node<T,Compare>	* root;		/* root node */
+    node<T>	* root;		/* root node */
     int	enqcmps;	/* compares in spenq */
 };
 
 /** Forward declarations for the c++ interface */
 /* init tree */
-template<class T, class Compare>
-void spinit(SPTREE<T,Compare>*);
+template<class T>
+void spinit(SPTREE<T>*);
 
 /* insert item into the tree */
 template<class T, class Compare>
-node<T,Compare>* spenq(node<T,Compare>*, SPTREE<T,Compare>*);
+node<T>* spenq(node<T>*, SPTREE<T>*);
 
 /* return and remove lowest item in subtree */
-template<class T, class Compare>
-node<T,Compare>* spdeq(node<T,Compare>**);
+template<class T>
+node<T>* spdeq(node<T>**);
 
 /* return first node in tree */
-template<class T, class Compare>
-node<T,Compare>* sphead(SPTREE<T,Compare>*);
+template<class T>
+node<T>* sphead(SPTREE<T>*);
 
 } // end namespace

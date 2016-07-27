@@ -48,7 +48,6 @@ Hines changed to void spinit(SPTREE**) for use with TQueue.
  *  SPBLK *spdeq( np )		Return first key under *np, removing it.
  *  void splay( n, q )		n (already in q) becomes the root.
  *  int n = sphead( q )         n is the head item in q (not removed).
- *  spdelete( n, q )		n is removed from q.
  *
  *  In the above, n points to an SPBLK type, while q points to an
  *  SPTREE.
@@ -124,8 +123,8 @@ struct helper_comparator<T,std::less<T>>{
  * spinit() -- initialize an empty splay tree
  *
  */
-template<class T, class Compare>
-void spinit(sptq::SPTREE<T,Compare>* q){
+template<class T>
+void spinit(sptq::SPTREE<T>* q){
     q->enqcmps = 0;
     q->root = NULL;
 }
@@ -144,13 +143,13 @@ void spinit(sptq::SPTREE<T,Compare>* q){
  *  and the right branch of the left subtree
  */
 template<class T, class Compare>
-node<T,Compare> * spenq( node<T,Compare>* n, SPTREE<T,Compare>* q ) {
-    typename node<T,Compare>::value_type key;
+node<T> * spenq( node<T>* n, SPTREE<T>* q ) {
+    typename node<T>::value_type key;
 
-    node<T,Compare> * left;	/* the rightmost node in the left tree */
-    node<T,Compare> * right;	/* the leftmost node in the right tree */
-    node<T,Compare> * next;	/* the root of the unsplit part */
-    node<T,Compare> * temp;
+    node<T> * left;	/* the rightmost node in the left tree */
+    node<T> * right;	/* the leftmost node in the right tree */
+    node<T> * next;	/* the root of the unsplit part */
+    node<T> * temp;
     
     n->parent_ = NULL;
     next = q->root;
@@ -280,15 +279,15 @@ node<T,Compare> * spenq( node<T,Compare>* n, SPTREE<T,Compare>* q ) {
  *  subtree (if there is one); on the way to the leftmost node, rotations
  *  are performed to shorten the left branch of the tree
  */
-template<class T, class Compare>
-node<T,Compare> * spdeq(node<T,Compare>** np ) /* pointer to a node pointer */
+template<class T>
+node<T> * spdeq(node<T>** np ) /* pointer to a node pointer */
 
 {
-    node<T,Compare> * deq;  		/* one to return */
-    node<T,Compare> * next;       	/* the next thing to deal with */
-    node<T,Compare> * left;      	/* the left child of next */
-    node<T,Compare> * farleft;		/* the left child of left */
-    node<T,Compare> * farfarleft;	/* the left child of farleft */
+    node<T> * deq;  		/* one to return */
+    node<T> * next;       	/* the next thing to deal with */
+    node<T> * left;      	/* the left child of next */
+    node<T> * farleft;		/* the left child of left */
+    node<T> * farfarleft;	/* the left child of farleft */
 
     if( np == NULL || *np == NULL )
     {
@@ -364,15 +363,15 @@ node<T,Compare> * spdeq(node<T,Compare>** np ) /* pointer to a node pointer */
  *  this code assumes that n is not NULL and is in q; it can sometimes
  *  detect n not in q and complain
  */
-template<class T, class Compare>
-void splay( node<T,Compare>* n, SPTREE<T,Compare>* q )
+template<class T>
+void splay( node<T>* n, SPTREE<T>* q )
 {
-    node<T,Compare> * up;	/* points to the node being dealt with */
-    node<T,Compare> * prev;	/* a descendent of up, already dealt with */
-    node<T,Compare> * upup;	/* the parent of up */
-    node<T,Compare> * upupup;	/* the grandparent of up */
-    node<T,Compare> * left;	/* the top of left subtree being built */
-    node<T,Compare> * right;	/* the top of right subtree being built */
+    node<T> * up;	/* points to the node being dealt with */
+    node<T> * prev;	/* a descendent of up, already dealt with */
+    node<T> * upup;	/* the parent of up */
+    node<T> * upupup;	/* the grandparent of up */
+    node<T> * left;	/* the top of left subtree being built */
+    node<T> * right;	/* the top of right subtree being built */
 
     left = n->left_;
     right = n->right_;
@@ -471,10 +470,10 @@ void splay( node<T,Compare>* n, SPTREE<T,Compare>* q )
  *      avoids splaying but just searches for and returns a pointer to
  *      the bottom of the left branch
  */
-template<class T, class Compare>
-node<T,Compare> * sphead( SPTREE<T,Compare>* q )
+template<class T>
+node<T> * sphead( SPTREE<T>* q )
 {
-    node<T,Compare> * x;
+    node<T> * x;
 
     /* splay version, good amortized bound */
     x = spdeq( &q->root );
@@ -494,39 +493,5 @@ node<T,Compare> * sphead( SPTREE<T,Compare>* q )
     return( x );
 
 } /* sphead */
-
-
-/*----------------
- *
- * spdelete() -- Delete node from a tree.
- *
- *	n is deleted from q; the resulting splay tree has been splayed
- *	around its new root, which is the successor of n
- *
- */
-template<class T, class Compare>
-void spdelete( node<T,Compare>* n, SPTREE<T,Compare>* q ) {
-    node<T,Compare> * x;
-
-    splay( n, q );
-    x = spdeq( &q->root->right_ );
-    if( x == NULL )		/* empty right subtree */
-    {
-        q->root = q->root->left_;
-        if (q->root) q->root->parent_ = NULL;
-    }
-    else			/* non-empty right subtree */
-    {
-        x->parent_ = NULL;
-        x->left_ = q->root->left_;
-        x->right_ = q->root->right_;
-        if( x->left_ != NULL )
-        x->left_->parent_ = x;
-        if( x->right_ != NULL )
-        x->right_->parent_ = x;
-        q->root = x;
-    }
-
-} /* spdelete */
 
 } // end namespace

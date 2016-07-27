@@ -45,7 +45,7 @@ as it was in the original version */
 template<class T = double, class Compare = std::less<T>>
 class TQueue {
 public:
-    typedef sptq::SPTREE<T,Compare> container;
+    typedef sptq::SPTREE<T> container;
     typedef std::size_t size_type;
     typedef T value_type;
 
@@ -54,20 +54,20 @@ public:
     }
 
     inline ~TQueue(){
-        sptq::node<T,Compare> *n;
+        sptq::node<T> *n;
         while((n = sptq::spdeq(&(&q)->root)) != NULL)
           delete n;
     }
 
     inline void push(value_type value){
-        sptq::node<T,Compare> *n = new sptq::node<T,Compare>(value);
-        sptq::spenq(n, &q);
+        sptq::node<T> *n = new sptq::node<T>(value);
+        sptq::spenq<T,Compare>(n, &q); // the Comparator is use only here
         s++;
     }
 
     inline void pop(){
         if(!empty()){
-            sptq::node<T,Compare> *n = sptq::spdeq(&(&q)->root);
+            sptq::node<T> *n = sptq::spdeq(&(&q)->root);
             delete n; // pop remove definitively the element else memory leak
             s--;
         }
@@ -76,7 +76,7 @@ public:
     inline value_type top(){
         value_type tmp = value_type();
         if(!empty())
-            tmp = sptq::sphead<T,Compare>(&q)->key();
+            tmp = sptq::sphead<T>(&q)->key();
         return tmp;
     }
 
