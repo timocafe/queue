@@ -140,7 +140,7 @@ namespace queue{
 } // end name space
 
 int main(int argc, char* argv[]){
-    int iteration = 10;//std::atoi(argv[1]);
+    int iteration = std::atoi(argv[1]);
     //queue types
     using t0 = helper_type<priority_queue>;
     using t1 = helper_type<sptq_queue>;
