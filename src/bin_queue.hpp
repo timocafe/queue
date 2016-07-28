@@ -38,6 +38,8 @@ namespace tool {
             delete q;
         }
 
+        /* the top corresponds to the beginning of the queue as here we are mimic std::priority_queue with 
+         the greated comparator */
         inline value_type top(){
             return bins_[qpt_]->key();
         }

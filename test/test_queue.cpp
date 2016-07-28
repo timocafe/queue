@@ -6,16 +6,16 @@
 #include <random>
 #include <iostream>
 
-#include "tqueue.hpp"
+#include "sptq_queue.hpp"
 //Test only MH, not std or boost, captain obvious
 BOOST_AUTO_TEST_CASE(constructor) {
-    sptq::TQueue<> queue;
+    tool::sptq_queue<> queue;
     BOOST_CHECK_EQUAL(queue.size(),0); // integer
     BOOST_CHECK_EQUAL(queue.top(),0.); //by default double
 }
 
 BOOST_AUTO_TEST_CASE(push_pop) {
-    sptq::TQueue<> queue;
+    tool::sptq_queue<> queue;
     queue.push(1);
     BOOST_CHECK_EQUAL(queue.size(),1); // integer
     BOOST_CHECK_EQUAL(queue.top(),1); //by default double
@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(push_pop) {
 }
 
 BOOST_AUTO_TEST_CASE(push_pop_random_less) {
-    sptq::TQueue<int> q; // std::less by default
+    tool::sptq_queue<int> q; // std::less by default
     std::array<int,10> a;
     std::iota(a.begin(),a.end(),0);
     std::random_shuffle(std::begin(a), std::end(a));
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(push_pop_random_less) {
 }
 
 BOOST_AUTO_TEST_CASE(push_pop_random_greater) {
-    sptq::TQueue<int,std::greater<int>> q;
+    tool::sptq_queue<int,std::greater<int>> q;
     std::array<int,10> a;
     std::iota(a.begin(),a.end(),0);
     std::random_shuffle(std::begin(a), std::end(a));
