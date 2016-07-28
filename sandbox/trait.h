@@ -66,7 +66,7 @@ struct helper_type<priority_queue>{
 
 template<>
 struct helper_type<spltree>{
-    typedef sptq::TQueue<double, std::greater<double>> value_type;
+    typedef tool::sptq_queue<double, std::greater<double>> value_type;
     constexpr static auto name = "original_queue";
 };
 

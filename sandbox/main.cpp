@@ -9,8 +9,8 @@
 #include <sstream>
 #include <iomanip>
 
-#include "tqueue.hpp"
-//#include "binqueue.hpp"
+#include "sptq_queue.hpp"
+#include "bin_queue.hpp"
 #include "trait.h"
 #include "timer_asm.h"
 
@@ -35,7 +35,7 @@ namespace queue{
                     for(int i = 0; i < size ; ++i)
                         queue.push(t + distribution(generator));
 
-                    while ( queue.top() <= t)
+                    while (queue.top() <= t)
                         queue.pop();
 
                     t += dt;
@@ -138,7 +138,6 @@ namespace queue{
         std::copy(res.begin(),res.end(), std::ostream_iterator<std::string>(out));
     }
 } // end name space
-
 
 int main(int argc, char* argv[]){
     int iteration = std::atoi(argv[1]);

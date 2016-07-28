@@ -26,7 +26,10 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-namespace sptq {
+#ifndef tqueue_ipp_
+#define tqueue_ipp_
+
+namespace tool {
 
 // splay tree + bin queue limited to fixed step method
 // for event-sets or priority queues
@@ -124,7 +127,7 @@ struct helper_comparator<T,std::less<T>>{
  *
  */
 template<class T>
-void spinit(sptq::SPTREE<T>* q){
+void spinit(tool::SPTREE<T>* q){
     q->enqcmps = 0;
     q->root = NULL;
 }
@@ -495,3 +498,5 @@ node<T> * sphead( SPTREE<T>* q )
 } /* sphead */
 
 } // end namespace
+
+#endif

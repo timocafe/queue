@@ -26,19 +26,23 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-namespace sptq { // namespace si better than C style
+#ifndef tqueue_helper_h_
+#define tqueue_helper_h_
+
+namespace tool { // namespace si better than C style
 
 template<class T>
 struct node {
     typedef T value_type;
 
-    explicit node(value_type t = value_type()):t_(t),left_(0),right_(0),parent_(0){};
+    explicit node(value_type t = value_type()):t_(t),left_(0),right_(0),parent_(0),cnt_(-1){};
     // remove the macro "key" now key() is function but I keep the MH notation
     inline value_type key() { return t_;} const
 	value_type t_;
 	node* left_;
 	node* right_;
 	node* parent_;
+    int cnt_;
 };
 
 template<class T>
@@ -65,3 +69,5 @@ template<class T>
 node<T>* sphead(SPTREE<T>*);
 
 } // end namespace
+
+#endif

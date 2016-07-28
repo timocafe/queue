@@ -35,39 +35,39 @@ THE POSSIBILITY OF SUCH DAMAGE.
 #include <ostream>
 #include <functional>
 
-#include "tqueue.h"
+#include "queue_helper.h"
 
-namespace sptq {
+namespace tool {
 /** The queue: TQeue from Michael starts here, not compliant with std for the container,
 but ok for the type support and the comparator, by default std::less and not std::greated
-as it was in the original version */
+as it was in the original version, already a bit of clean up specially for the push ... */
 
 template<class T = double, class Compare = std::less<T>>
-class TQueue {
+class sptq_queue {
 public:
-    typedef sptq::SPTREE<T> container;
+    typedef tool::SPTREE<T> container;
     typedef std::size_t size_type;
     typedef T value_type;
 
-    inline TQueue():s(0) {
-        sptq::spinit(&q);
+    inline sptq_queue():s(0) {
+        tool::spinit(&q);
     }
 
-    inline ~TQueue(){
-        sptq::node<T> *n;
-        while((n = sptq::spdeq(&(&q)->root)) != NULL)
+    inline ~sptq_queue(){
+        tool::node<T> *n;
+        while((n = tool::spdeq(&(&q)->root)) != NULL)
           delete n;
     }
 
     inline void push(value_type value){
-        sptq::node<T> *n = new sptq::node<T>(value);
-        sptq::spenq<T,Compare>(n, &q); // the Comparator is use only here
+        tool::node<T> *n = new tool::node<T>(value);
+        tool::spenq<T,Compare>(n, &q); // the Comparator is use only here
         s++;
     }
 
     inline void pop(){
         if(!empty()){
-            sptq::node<T> *n = sptq::spdeq(&(&q)->root);
+            tool::node<T> *n = tool::spdeq(&(&q)->root);
             delete n; // pop remove definitively the element else memory leak
             s--;
         }
@@ -76,7 +76,7 @@ public:
     inline value_type top(){
         value_type tmp = value_type();
         if(!empty())
-            tmp = sptq::sphead<T>(&q)->key();
+            tmp = tool::sphead<T>(&q)->key();
         return tmp;
     }
 
@@ -102,12 +102,12 @@ private:
 
 // carefull the << delete the queue only for debugging 
 template<class T, class Compare>
-std::ostream& operator<< (std::ostream& os, TQueue<T,Compare>& q ){
+std::ostream& operator<< (std::ostream& os, sptq_queue<T,Compare>& q ){
     q.print(os);
     return os;
 }
 
 } // end namespace
-#include "tqueue.ipp"
+#include "sptq_queue.ipp"
 
 #endif
