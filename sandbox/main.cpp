@@ -140,26 +140,28 @@ namespace queue{
 } // end name space
 
 int main(int argc, char* argv[]){
-    int iteration = std::atoi(argv[1]);
+    int iteration = 10;//std::atoi(argv[1]);
     //queue types
     using t0 = helper_type<priority_queue>;
-    using t1 = helper_type<spltree>;
-    using t2 = helper_type<binomial_heap>;
-    using t3 = helper_type<fibonacci_heap>;
-    using t4 = helper_type<pairing_heap>;
-    using t5 = helper_type<skew_heap>;
-    using t6 = helper_type<d_ary_heap>;
+    using t1 = helper_type<sptq_queue>;
+    using t2 = helper_type<bin_queue>;
+    using t3 = helper_type<binomial_heap>;
+    using t4 = helper_type<fibonacci_heap>;
+    using t5 = helper_type<pairing_heap>;
+    using t6 = helper_type<skew_heap>;
+    using t7 = helper_type<d_ary_heap>;
     //bench types
     using push = queue::push_helper;
     using pop = queue::pop_helper;
     using push_one = queue::push_one_helper;
     using mh = queue::mhines_bench_helper;
     //benchmarks
-    queue::benchmark<push,t0,t1,t2,t3,t4,t5,t6>(iteration);
-    queue::benchmark<pop,t0,t1,t2,t3,t4,t5,t6>(iteration);
-    queue::benchmark<push_one,t0,t1,t2,t3,t4,t5,t6>(iteration);
-    queue::benchmark<push_one,t0,t1,t2,t3,t4,t5,t6>(iteration);
-    queue::benchmark<mh,t0,t1,t2,t3,t4,t5,t6>(iteration);
+    queue::benchmark<push,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
+    queue::benchmark<pop,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
+    queue::benchmark<push_one,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
+    queue::benchmark<push_one,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
+    queue::benchmark<mh,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
+
 
     return 0;
 }

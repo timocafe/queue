@@ -31,6 +31,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace tool { // namespace si better than C style
 
+//the node is too fat for the bin queue right and left useless
 template<class T>
 struct node {
     typedef T value_type;

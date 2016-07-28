@@ -16,7 +16,7 @@
 #include <boost/heap/pairing_heap.hpp>
 #include <boost/heap/skew_heap.hpp>
 
-enum container {spltree, priority_queue,binomial_heap,fibonacci_heap,pairing_heap,skew_heap,d_ary_heap};
+enum container {sptq_queue, bin_queue, priority_queue,binomial_heap,fibonacci_heap,pairing_heap,skew_heap,d_ary_heap};
 
 //name helper printer
 template<class D, class... T>
@@ -65,9 +65,15 @@ struct helper_type<priority_queue>{
 };
 
 template<>
-struct helper_type<spltree>{
+struct helper_type<sptq_queue>{
     typedef tool::sptq_queue<double, std::greater<double>> value_type;
-    constexpr static auto name = "original_queue";
+    constexpr static auto name = "original_sptq_queue";
+};
+
+template<>
+struct helper_type<bin_queue>{ // no comparator great by default
+    typedef tool::sptq_queue<double> value_type;
+    constexpr static auto name = "original_bin_queue";
 };
 
 template<>

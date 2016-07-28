@@ -57,15 +57,6 @@ namespace tool{
         bins_[idt] = q;
     }
 
-    tool::node<double>* bin_queue::dequeue() {
-        tool::node<double>* q = NULL;
-        q = bins_[qpt_];
-        if (q) {
-            bins_[qpt_] = q->left_;
-        }
-        return q;
-    }
-
     tool::node<double>* bin_queue::first() {
         for (int i = 0; i < nbin_; ++i) {
             if (bins_[i]) {

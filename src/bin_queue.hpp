@@ -34,14 +34,21 @@ namespace tool {
         }
 
         inline void pop(){
-            tool::node<double>* q = dequeue();
-            delete q;
+            if(!empty()){
+                tool::node<double>* q = first();
+                remove(q);
+                delete q;
+                size_--;
+            }
         }
 
         /* the top corresponds to the beginning of the queue as here we are mimic std::priority_queue with 
          the greated comparator */
         inline value_type top(){
-            return bins_[qpt_]->key();
+            value_type r = value_type();
+            if(!empty())
+                r = first()->key();
+            return r;
         }
 
         inline size_type size(){
@@ -55,18 +62,6 @@ namespace tool {
         /** original API */
         inline void enqueue(value_type tt, tool::node<value_type>*);
 
-        void shift(value_type tt) {
-            assert(!bins_[qpt_]);
-            tt_ = tt;
-            if (++qpt_ >= nbin_) {
-                qpt_ = 0;
-            }
-        }
-
-        tool::node<value_type>* dequeue();
-
-        value_type tbin() { return tt_; }
-
         // for intenal only
         tool::node<value_type>* first();
         tool::node<value_type>* next(tool::node<value_type>*);
@@ -75,7 +70,7 @@ namespace tool {
     private:
         size_type size_;
         int nbin_; // number of bin
-        int qpt_;
+        int qpt_; // unused here
         value_type dt_; // step times
         value_type tt_; // time at beginning of qpt_ interval
         tool::node<value_type>** bins_; // container
