@@ -8,10 +8,10 @@ namespace tool {
     bin from smallest to largest, into a bin there is NO specific order*. The determination
     of the bin is choosen by a kind of hash function (the hash give the bin "bucket").
     Into a bin with have a single link list using the "left" link of the node class.
-     
+
     Objectively this queue is designed only for our problem because we are hashing "time"
-    using the inverse of dt. Consequently, genericity with template is useless 
- 
+    using the inverse of dt. Consequently, genericity with template is useless
+
     I remove the array and use a std::vector to have a safe resize
  */
 
@@ -22,7 +22,7 @@ namespace tool {
         typedef std::size_t size_type;
 
         inline explicit bin_queue(double dt = 0.025, value_type t0 = 0.):size_(0),qpt_(0),dt_(dt),tt_(t0)
-                                                                             ,bins_(1024,0){}
+                                                                             ,bins_(1024,NULL){}
 
         ~bin_queue();
 

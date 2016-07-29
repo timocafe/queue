@@ -18,7 +18,7 @@ namespace queue{
 
     struct mhines_bench_helper {
         template<class T>
-        static double benchmark(int size, int repetition = 1){
+        static double benchmark(int size, int repetition = 2){
             repetition=1;
             using value_type = typename T::value_type;
             std::default_random_engine generator;
@@ -51,7 +51,7 @@ namespace queue{
 
     struct push_helper{
         template<class T>
-        static double benchmark(int size, int repetition = 1){
+        static double benchmark(int size, int repetition = 5){
             using value_type = typename T::value_type;
             std::default_random_engine generator;
             std::uniform_real_distribution<double> distribution(0.0,1.0);
