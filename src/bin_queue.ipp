@@ -1,64 +1,37 @@
 
-#ifndef binqueue_ipp_
-#define binqueue_ipp_
+#ifndef bin_queue_ipp_
+#define bin_queue_ipp_
 
 #include "queue_helper.h" //for the sptq::node object
 
 namespace tool{
 
-    bin_queue::~bin_queue() {
-        tool::node<double>* q, *q2;
+    template<class T>
+    bin_queue<T>::~bin_queue() {
+        tool::node<T>* q, *q2;
         for (q = first(); q; q = q2) {
-                q2 = next(q);
-                remove(q); /// Potentially dereferences freed pointer this->sptree_
+            q2 = next(q);
+            remove(q); /// Potentially dereferences freed pointer this->sptree_
         }
-        // check
-        for (int i=0; i < nbin_; ++i) {
-            assert(!bins_[i]);
-        }
-        delete [] bins_;
     }
 
-    void bin_queue::resize(int size) {
-        //printf("BinQ::resize from %d to %d\n", nbin_, size);
-        int i, j;
-        tool::node<double>* q;
-        assert(size >= nbin_);
-        tool::node<double>** bins = new tool::node<double>*[size];
-        for (i=nbin_; i < size; ++i) { bins[i] = 0; }
-        for (i=0, j=qpt_; i < nbin_; ++i, ++j) {
-            if (j >= nbin_) { j = 0; }
-            bins[i] = bins_[j];
-            for (q = bins[i]; q; q = q->left_) {
-                q->cnt_ = i;
-            }
-        }
-        delete [] bins_;
-        bins_ = bins;
-        nbin_ = size;
-        qpt_ = 0;
-    }
-
-    void bin_queue::enqueue(double td, tool::node<double>* q) {
+    template<class T>
+    void bin_queue<T>::enqueue(T td, tool::node<T>* q) {
 
         int rev_dt = 1/dt_;
         int idt = (int)((td - tt_)*rev_dt + 1.e-10);
         assert(idt >= 0);
-        if (idt >= nbin_) {
-            resize(idt + 1000);
-        }
-        //assert (idt < nbin_);
         idt += qpt_;
-        if (idt >= nbin_) { idt -= nbin_; }
-        //printf("enqueue: idt=%d qpt=%d nbin_=%d\n", idt, qpt_, nbin_);
-        assert (idt < nbin_);
+//        if (idt >= bins_.size()) { idt -= bins_.size(); } // is it relevant now ?
+//        assert (idt < bins_.size());
         q->cnt_ = idt; // only for iteration
         q->left_ = bins_[idt];
         bins_[idt] = q;
     }
 
-    tool::node<double>* bin_queue::first() {
-        for (int i = 0; i < nbin_; ++i) {
+    template<class T>
+    tool::node<T>* bin_queue<T>::first() {
+        for (int i = 0; i < bins_.size(); ++i) {
             if (bins_[i]) {
                 return bins_[i];
             }
@@ -66,9 +39,10 @@ namespace tool{
         return 0;
     }
 
-    tool::node<double>* bin_queue::next(tool::node<double>* q) {
+    template<class T>
+    tool::node<T>* bin_queue<T>::next(tool::node<T>* q) {
         if (q->left_) { return q->left_; }
-        for (int i = q->cnt_ + 1; i < nbin_; ++i) {
+        for (int i = q->cnt_ + 1; i < bins_.size(); ++i) {
             if (bins_[i]) {
                 return bins_[i];
             }
@@ -76,8 +50,9 @@ namespace tool{
         return 0;
     }
 
-    void bin_queue::remove(tool::node<double>* q) {
-        tool::node<double>* q1, *q2;
+    template<class T>
+    void bin_queue<T>::remove(tool::node<T>* q) {
+        tool::node<T>* q1, *q2;
         q1 = bins_[q->cnt_];
         if (q1 == q) {
             bins_[q->cnt_] = q->left_;

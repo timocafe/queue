@@ -1,6 +1,6 @@
 
-#ifndef binqueue_hpp_
-#define binqueue_hpp_
+#ifndef bin_queue_hpp_
+#define bin_queue_hpp_
 
 namespace tool {
 
@@ -10,19 +10,19 @@ namespace tool {
     Into a bin with have a single link list using the "left" link of the node class.
      
     Objectively this queue is designed only for our problem because we are hashing "time"
-    using the inverse of dt. Consequently, genericity with template is useless */
+    using the inverse of dt. Consequently, genericity with template is useless 
+ 
+    I remove the array and use a std::vector to have a safe resize
+ */
 
+    template<class T>
     class bin_queue {
     public:
-        typedef double value_type;
+        typedef T value_type;
         typedef std::size_t size_type;
 
-        inline explicit bin_queue(value_type dt = 0.025, value_type t0 = 0.):nbin_(1000),qpt_(0),dt_(dt),tt_(t0){
-            size_ = 0;
-            bins_ = new tool::node<value_type>*[nbin_];
-            for (int i=0; i < nbin_; ++i)
-                bins_[i] = 0;
-        }
+        inline explicit bin_queue(double dt = 0.025, value_type t0 = 0.):size_(0),qpt_(0),dt_(dt),tt_(t0)
+                                                                             ,bins_(1024,0){}
 
         ~bin_queue();
 
@@ -35,7 +35,7 @@ namespace tool {
 
         inline void pop(){
             if(!empty()){
-                tool::node<double>* q = first();
+                tool::node<value_type>* q = first();
                 remove(q);
                 delete q;
                 size_--;
@@ -66,14 +66,12 @@ namespace tool {
         tool::node<value_type>* first();
         tool::node<value_type>* next(tool::node<value_type>*);
         void remove(tool::node<value_type>*);
-        void resize(int);
     private:
         size_type size_;
-        int nbin_; // number of bin
         int qpt_; // unused here
-        value_type dt_; // step times
+        double dt_; // step times
         value_type tt_; // time at beginning of qpt_ interval
-        tool::node<value_type>** bins_; // container
+        std::vector<tool::node<value_type>* > bins_; // for correct resize
     };
 }
 
