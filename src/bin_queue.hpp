@@ -29,8 +29,8 @@ namespace tool {
         /** std::priority_queue API like */
         inline void push(value_type t){
             tool::node<value_type>* n = new tool::node<value_type>(t);
-            size_++;
             enqueue(t,n); // t encapsulate in the node but also needed for the "hash function"
+            size_++;
         }
 
         inline void pop(){

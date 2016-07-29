@@ -20,6 +20,8 @@ namespace tool{
 
         int rev_dt = 1/dt_;
         int idt = (int)((td - tt_)*rev_dt + 1.e-10);
+        if(idt >= bins_.size())
+            bins_.resize(2*idt);
         assert(idt >= 0);
         idt += qpt_;
 //        if (idt >= bins_.size()) { idt -= bins_.size(); } // is it relevant now ?
