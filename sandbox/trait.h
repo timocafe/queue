@@ -72,7 +72,7 @@ struct helper_type<sptq_queue>{
 
 template<>
 struct helper_type<bin_queue>{ // no comparator great by default
-    typedef tool::sptq_queue<double> value_type;
+    typedef tool::bin_queue<double> value_type;
     constexpr static auto name = "original_bin_queue";
 };
 
