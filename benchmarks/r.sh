@@ -1,9 +1,21 @@
 #!/bin/bash
 
-for i in data_core_E2670 data_core_PowerA2 data_core_i5_macmini
+for i in E2670 PowerA2 i5
 do
-    cp plot.txt ${i}
-    cd ${i}
+    cp plot.txt data_core_${i}
+    cd data_core_${i}
+    case $i in
+        E2670)
+        sed -i -e "s/NAME/${i}-2.6[GHz]-GCC5.1/g" plot.txt
+        ;;
+        PowerA2)
+        sed -i -e "s/NAME/${i}-1.7[GHz]-GCC4.7/g" plot.txt
+        ;;
+        i5)
+        sed -i -e "s/NAME/${i}-2.5[GHz]-CLANG3.6/g" plot.txt
+        ;;
+    esac
     gnuplot plot.txt
+    open *.eps
     cd ..
 done
