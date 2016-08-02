@@ -14,6 +14,8 @@
 #include "trait.h"
 #include "timer_asm.h"
 
+#include "concurrent_queue.hpp"
+
 namespace queue{
 
     struct mhines_bench_helper {
@@ -145,8 +147,7 @@ namespace queue{
     }
 } // end name space
 
-int main(int argc, char* argv[]){
-    int iteration = std::atoi(argv[1]);
+void sequential_benchmark(int iteration = 10){
     //queue types
     using t0 = helper_type<priority_queue>;
     using t1 = helper_type<sptq_queue>;
@@ -166,6 +167,19 @@ int main(int argc, char* argv[]){
     queue::benchmark<pop,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<push_one,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<mh,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
+}
 
+int main(int argc, char* argv[]){
+//    int iteration = std::atoi(argv[1]);
+//    sequential_benchmark(iteration);
+    tool::concurrent_queue<double, tool::sptq_queue<double, std::greater<double>> > q;
+    
+    q.push(2);
+    q.push(2);
+    q.push(3);
+    q.push(4);
+    q.push(5);
+    
+    std::cout << q << std::endl;
     return 0;
 }
