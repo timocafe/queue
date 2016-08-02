@@ -70,7 +70,7 @@ namespace queue{
             const double dt = 0.025;
             const double max_time = 50.0;
 
-            tool::concurrent_queue<value_type,container_type> queue;
+            tool::concurrent_queue<value_type,container_type,tool::omp_lock_guard> queue;
             t1 = rdtsc();
 #ifdef _OPENMP
                 #pragma omp parallel
