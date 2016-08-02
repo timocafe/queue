@@ -17,6 +17,13 @@
 namespace tool{
 std::mutex mtx;
 
+
+struct omp_lock_guard {
+
+
+};
+
+
 /** concurrent_queue is just a wrapper for the lock, for c++11 thing to the the move constructor
 it may help for boost and std */
 template<class T, /** type */
@@ -41,14 +48,17 @@ class concurrent_queue{
     }
 
     inline value_type top(){
+        mutex_type lock(mtx);
         return queue.top();
     }
 
     inline size_type size(){
+        mutex_type lock(mtx);
         return queue.size();
     }
 
     inline bool empty(){
+        mutex_type lock(mtx);
         return queue.empty();
     }
     
