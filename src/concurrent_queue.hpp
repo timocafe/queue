@@ -41,6 +41,7 @@ class concurrent_queue{
     }
 
     inline value_type top(){
+        mutex_type lock(mtx);
         return queue.top();
     }
 
@@ -51,7 +52,7 @@ class concurrent_queue{
     inline bool empty(){
         return queue.empty();
     }
-    
+
     void print(std::ostream &os) {
         queue.print(os);
     }
