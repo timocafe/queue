@@ -16,22 +16,33 @@
 namespace tool{
 
 #ifdef _OPENMP
-omp_lock_t mtx;
+struct omp_mutex{
+    omp_mutex(){
+        omp_init_lock(&mtx);
+    }
+
+    ~omp_mutex(){
+        omp_destroy_lock(&mtx);
+    }
+
+    omp_lock_t mtx;
+};
+omp_mutex mtx;
 #else
 std::mutex mtx;
 #endif
 
 #ifdef _OPENMP
 struct omp_lock_guard {
-    inline omp_lock_guard(omp_lock_t &lock):lock_(lock){
-        omp_init_lock(&lock_);
+    inline omp_lock_guard(omp_mutex &lock):lock_(lock){
+        omp_set_lock(&lock_.mtx);
     }
 
     inline ~omp_lock_guard(){
-        omp_destroy_lock(&lock_);
+        omp_unset_lock(&lock_.mtx);
     }
 
-    omp_lock_t& lock_;
+    omp_mutex& lock_;
 };
 
 #endif
