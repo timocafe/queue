@@ -70,12 +70,10 @@ namespace queue{
             const double dt = 0.025;
             const double max_time = 50.0;
 
-            for(int j=0; j<repetition; ++j){
-                tool::concurrent_queue<value_type,container_type> queue;
-                t1 = rdtsc();
-
+            tool::concurrent_queue<value_type,container_type> queue;
+            t1 = rdtsc();
 #ifdef _OPENMP
-            #pragma omp parallel
+                #pragma omp parallel
 #endif
                 for(auto t=0.0; t < max_time; t += dt){
                     for(int i = 0; i < size ; ++i)
@@ -86,16 +84,13 @@ namespace queue{
 
                     t += dt;
                 }
-
-                t2 = rdtsc();
-                time += (t2 - t1);
-            }
+            t2 = rdtsc();
+            time += (t2 - t1);
             return time*1/static_cast<double>(repetition);
         }
 
         constexpr static auto name = "mh_parallel";
     };
-    
 
     template<class F, class ...T>
     void benchmark(int iteration, int size = 1){
@@ -142,16 +137,7 @@ void sequential_benchmark(int iteration = 10){
 }
 
 int main(int argc, char* argv[]){
-//    int iteration = std::atoi(argv[1]);
-//    sequential_benchmark(iteration);
-    tool::concurrent_queue<double, tool::sptq_queue<double, std::greater<double>> > q;
-    
-    q.push(2);
-    q.push(2);
-    q.push(3);
-    q.push(4);
-    q.push(5);
-    
-    std::cout << q << std::endl;
+    int iteration = std::atoi(argv[1]);
+    sequential_benchmark(iteration);
     return 0;
 }

@@ -61,7 +61,7 @@ class concurrent_queue{
         mutex_type lock(mtx);
         return queue.empty();
     }
-    
+
     void print(std::ostream &os) {
         queue.print(os);
     }
