@@ -14,14 +14,11 @@
 #include <mutex>
 #include <queue>
 
+#include "locker.h"
+
+
+
 namespace tool{
-std::mutex mtx;
-
-
-struct omp_lock_guard {
-
-
-};
 
 
 /** concurrent_queue is just a wrapper for the lock, for c++11 thing to the the move constructor
