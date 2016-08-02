@@ -12,6 +12,7 @@
 
 #include <thread>
 #include <mutex>
+#include <queue>
 
 namespace tool{
 std::mutex mtx;
@@ -34,12 +35,12 @@ class concurrent_queue{
         queue.push(value);
     }
 
-    inline value_type pop(){
+    inline void pop(){
         mutex_type lock(mtx);
-        return queue.pop();
+        queue.pop();
     }
 
-    inline value_type& top(){
+    inline value_type top(){
         return queue.top();
     }
 

@@ -1,2 +1,5 @@
 add_compile_options(-std=c++11)
+if(OPENMP_FOUND)
+add_compile_options(${OpenMP_C_FLAGS})
+endif()
 add_executable(queue  main.cpp)

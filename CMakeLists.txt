@@ -1,8 +1,11 @@
 cmake_minimum_required (VERSION 2.8.12)
 project (queue)
 find_package(Boost 1.49 REQUIRED unit_test_framework)
+FIND_PACKAGE(OpenMP)
+
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(src)
+
 
 option (QUEUE_TESTS "Build the regression tests" OFF)
 
