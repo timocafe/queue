@@ -16,10 +16,7 @@
 
 #include "locker.h"
 
-
-
 namespace tool{
-
 
 /** concurrent_queue is just a wrapper for the lock, for c++11 thing to the the move constructor
 it may help for boost and std */
@@ -30,7 +27,7 @@ class concurrent_queue{
     typedef typename Q::value_type value_type;
     typedef typename Q::size_type size_type;
     typedef Q container_type;
-    typedef L mutex_type;//not necessarely a mutex but using RAII pattern
+    typedef L mutex_type;//not necessarely a mutex but using RAII pattern like std::lock_gard
     public:
     concurrent_queue():queue(){}
 
