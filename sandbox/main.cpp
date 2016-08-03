@@ -13,7 +13,6 @@
 
 #include "sptq_queue.hpp"
 #include "bin_queue.hpp"
-#include "concurrent_queue.hpp"
 
 #include "trait.h"
 #include "push_pop.h" //benchmark push/pop
@@ -55,46 +54,6 @@ namespace queue{
 
         constexpr static auto name = "mh";
     };
-    
-        struct mhines_bench_parallel_helper {
-        template<class T>
-        static double benchmark(int size, int repetition = 2){
-            repetition=1;
-            using container_type = typename T::value_type;
-            using value_type = typename T::value_type::value_type;
-
-            std::default_random_engine generator;
-            std::uniform_real_distribution<double> distribution(0.5,2.0);
-            unsigned long long int t1(0),t2(0),time(0);
-
-            const double dt = 0.025;
-            const double max_time = 50.0;
-
-#ifdef _OPENMP
-            tool::concurrent_queue<value_type,container_type,tool::omp_lock_guard> queue;
-#else
-            tool::concurrent_queue<value_type,container_type> queue;
-#endif
-            t1 = rdtsc();
-#ifdef _OPENMP
-                #pragma omp parallel
-#endif
-                for(auto t=0.0; t < max_time; t += dt){
-                    for(int i = 0; i < size ; ++i)
-                        queue.push(t + distribution(generator));
-
-                    while (queue.top() <= t)
-                        queue.pop();
-
-                    t += dt;
-                }
-            t2 = rdtsc();
-            time += (t2 - t1);
-            return time*1/static_cast<double>(repetition);
-        }
-
-        constexpr static auto name = "mh_parallel";
-    };
 
     template<class F, class ...T>
     void benchmark(int iteration, int size = 1){
@@ -130,14 +89,11 @@ void sequential_benchmark(int iteration = 10){
     using pop = queue::pop_helper;
     using push_one = queue::push_one_helper;
     using mh = queue::mhines_bench_helper;
-    using mhp = queue::mhines_bench_parallel_helper;
     //benchmarks
     queue::benchmark<push,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<pop,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<push_one,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<mh,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
-    queue::benchmark<mhp,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
-
 }
 
 int main(int argc, char* argv[]){
