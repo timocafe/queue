@@ -16,7 +16,8 @@
 #include <boost/heap/pairing_heap.hpp>
 #include <boost/heap/skew_heap.hpp>
 
-enum container {sptq_queue, bin_queue, priority_queue,binomial_heap,fibonacci_heap,pairing_heap,skew_heap,d_ary_heap};
+enum container {sptq_queue, bin_queue, priority_queue,binomial_heap,
+                fibonacci_heap,pairing_heap,skew_heap,d_ary_heap,concurrent_priority_queue};
 
 //name helper printer
 template<class D, class... T>
@@ -106,6 +107,33 @@ struct helper_type<d_ary_heap>{
     typedef boost::heap::d_ary_heap<double,boost::heap::arity<16>, boost::heap::compare<std::greater<double>>> value_type;
     constexpr static auto name = "boost::d_ary_heap";
 };
+
+template<>
+struct helper_type<concurrent_priority_queue>{
+    typedef tbb::concurrent_priority_queue<double, std::greater<double>>  value_type;
+    constexpr static auto name = "tbb::concurrent_priority_queue";
+};
+
+
+//top does not exist with tbb because unsafe, so we use try pop
+
+    template<class Q>
+    bool try_pop(Q & queue,
+                 typename Q::value_type &value){
+        if(!queue.empty()){
+            value = queue.top();
+            queue.pop();
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    template<>
+    bool try_pop<tbb::concurrent_priority_queue<double, std::greater<double>>>
+        (tbb::concurrent_priority_queue<double, std::greater<double>> & queue,double &value){
+        return queue.try_pop(value);
+    }
 
 
 #endif /* trait_h */

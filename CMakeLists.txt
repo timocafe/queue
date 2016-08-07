@@ -1,9 +1,12 @@
 cmake_minimum_required (VERSION 2.8.12)
 project (queue)
-find_package(Boost 1.49 REQUIRED unit_test_framework)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake)
+FIND_PACKAGE(Boost 1.49 REQUIRED unit_test_framework)
 FIND_PACKAGE(OpenMP)
+FIND_PACKAGE(TBB)
 
 include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${TBB_INCLUDE_DIRS})
 include_directories(src)
 
 

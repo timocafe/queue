@@ -11,6 +11,8 @@
 
 #include "timer_asm.h"
 
+#include "tbb/concurrent_priority_queue.h"
+
 #include "sptq_queue.hpp"
 #include "bin_queue.hpp"
 
@@ -22,6 +24,8 @@
 namespace queue{
 
 
+
+
     struct mhines_bench_helper {
         template<class T>
         static double benchmark(int size, int repetition = 2){
@@ -30,6 +34,9 @@ namespace queue{
             std::default_random_engine generator;
             std::uniform_real_distribution<double> distribution(0.5,2.0);
             unsigned long long int t1(0),t2(0),time(0);
+
+            typename value_type::value_type value; // this is a double
+            bool state; // for try pop no really relevant with serial queue
 
             const double dt = 0.025;
             const double max_time = 50.0;
@@ -41,8 +48,10 @@ namespace queue{
                     for(int i = 0; i < size ; ++i)
                         queue.push(t + distribution(generator));
 
-                    while (queue.top() <= t)
-                        queue.pop();
+                    do { state = try_pop(queue,value);
+                        if(value > t)
+                            queue.push(t);
+                    }  while (state);
 
                     t += dt;
                 }
@@ -84,6 +93,7 @@ void sequential_benchmark(int iteration = 10){
     using t5 = helper_type<pairing_heap>;
     using t6 = helper_type<skew_heap>;
     using t7 = helper_type<d_ary_heap>;
+    using t8 = helper_type<concurrent_priority_queue>;
     //bench types
     using push = queue::push_helper;
     using pop = queue::pop_helper;
@@ -93,7 +103,8 @@ void sequential_benchmark(int iteration = 10){
     queue::benchmark<push,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<pop,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<push_one,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
-    queue::benchmark<mh,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
+    queue::benchmark<mh,t0,t1,t2,t3,t4,t5,t6,t7,t8>(iteration);
+
 }
 
 int main(int argc, char* argv[]){
