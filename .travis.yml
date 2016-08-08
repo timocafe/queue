@@ -20,7 +20,7 @@ addons:
 before_script:
   - mkdir build
   - cd build
-  - cmake -DQUEUE_TESTS=on ..
+  - TBB_ROOT=/usr/local cmake -DQUEUE_TESTS=on ..
 script:
   - make
   - ctest
