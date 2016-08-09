@@ -9,6 +9,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include  <boost/lockfree/stack.hpp>
+
 #include "timer_asm.h"
 
 #include "tbb/concurrent_priority_queue.h"
@@ -19,14 +21,13 @@
 #include "trait.h"
 #include "push_pop.h" //benchmark push/pop
 
-
-
 namespace queue{
 
 
 
 
     struct mhines_bench_helper {
+        
         template<class T>
         static double benchmark(int size, int repetition = 2){
             repetition=1;
@@ -44,6 +45,7 @@ namespace queue{
             for(int j=0; j<repetition; ++j){
                 value_type queue;
                 t1 = rdtsc();
+
                 for(auto t=0.0; t < max_time; t += dt){
                     for(int i = 0; i < size ; ++i)
                         queue.push(t + distribution(generator));
@@ -55,9 +57,13 @@ namespace queue{
 
                     t += dt;
                 }
+
+
                 t2 = rdtsc();
                 time += (t2 - t1);
             }
+
+
             return time*1/static_cast<double>(repetition);
         }
 
@@ -107,8 +113,25 @@ void sequential_benchmark(int iteration = 10){
 
 }
 
+struct event{
+    double a;
+    int b;
+};
+
+struct test{
+    test(int i){
+        v.resize(i);
+    };
+private:
+    std::vector<boost::lockfree::stack<event>> v;
+};
+
 int main(int argc, char* argv[]){
     int iteration = std::atoi(argv[1]);
-    sequential_benchmark(iteration);
+//    sequential_benchmark(iteration);
+ //   std::vector<boost::lockfree::stack<event>> v(100);
+    boost::lockfree::stack<double,  boost::lockfree::capacity<1000>  > u(1000);
+    //v.resize(123);
+//    test a(iteration);
     return 0;
 }
