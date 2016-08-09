@@ -113,25 +113,8 @@ void sequential_benchmark(int iteration = 10){
 
 }
 
-struct event{
-    double a;
-    int b;
-};
-
-struct test{
-    test(int i){
-        v.resize(i);
-    };
-private:
-    std::vector<boost::lockfree::stack<event>> v;
-};
-
 int main(int argc, char* argv[]){
     int iteration = std::atoi(argv[1]);
-//    sequential_benchmark(iteration);
- //   std::vector<boost::lockfree::stack<event>> v(100);
-    boost::lockfree::stack<double,  boost::lockfree::capacity<1000>  > u(1000);
-    //v.resize(123);
-//    test a(iteration);
+    sequential_benchmark(iteration);
     return 0;
 }
