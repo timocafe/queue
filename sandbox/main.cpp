@@ -7,6 +7,7 @@
 #include <list>
 #include <set>
 #include <sstream>
+#include <thread>
 #include <iomanip>
 
 #if defined(_OPENMP)
@@ -142,6 +143,7 @@ struct benchmark{
                 if(value > t){
                     v.at(tid).push(t);
                     state = false;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1)); // we do something
                 }
             } while(state);
 
