@@ -15,6 +15,7 @@
 #include <boost/heap/fibonacci_heap.hpp>
 #include <boost/heap/pairing_heap.hpp>
 #include <boost/heap/skew_heap.hpp>
+#include "tbb/concurrent_priority_queue.h"
 
 enum container {sptq_queue, bin_queue, priority_queue,binomial_heap,
                 fibonacci_heap,pairing_heap,skew_heap,d_ary_heap,concurrent_priority_queue};
@@ -118,15 +119,13 @@ struct helper_type<concurrent_priority_queue>{
 //top does not exist with tbb because unsafe, so we use try pop
 
     template<class Q>
-    bool try_pop(Q & queue,
-                 typename Q::value_type &value){
-        if(!queue.empty()){
-            value = queue.top();
+    bool try_pop(Q & queue, typename Q::value_type &value){
+        bool b=!queue.empty();
+        if(b){
+            value=queue.top();
             queue.pop();
-            return true;
-        }else{
-            return false;
         }
+        return b;
     }
 
     template<>

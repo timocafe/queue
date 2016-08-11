@@ -9,11 +9,9 @@
 #include <sstream>
 #include <iomanip>
 
-#include  <boost/lockfree/stack.hpp>
+#include "tbb/tbb.h"
 
 #include "timer_asm.h"
-
-#include "tbb/concurrent_priority_queue.h"
 
 #include "sptq_queue.hpp"
 #include "bin_queue.hpp"
@@ -22,7 +20,6 @@
 #include "push_pop.h" //benchmark push/pop
 
 namespace queue{
-
 
 
 
@@ -48,12 +45,15 @@ namespace queue{
 
                 for(auto t=0.0; t < max_time; t += dt){
                     for(int i = 0; i < size ; ++i)
-                        queue.push(t + distribution(generator));
+                        queue.push((t + distribution(generator)));
 
-                    do { state = try_pop(queue,value);
-                        if(value > t)
+                    do {
+                        state = try_pop(queue,value);
+                        if(value > t){
                             queue.push(t);
-                    }  while (state);
+                            state = false;
+                        }
+                    }while (state);
 
                     t += dt;
                 }
@@ -63,15 +63,19 @@ namespace queue{
                 time += (t2 - t1);
             }
 
-
             return time*1/static_cast<double>(repetition);
         }
 
         constexpr static auto name = "mh";
     };
 
+
+
+
+
+
     template<class F, class ...T>
-    void benchmark(int iteration, int size = 1){
+    void benchmark(int iteration, int size = 16){
 
         std::list<std::string> res(1,"#elements," + name_helper<T...>::name() + "\n");
 
@@ -110,11 +114,85 @@ void sequential_benchmark(int iteration = 10){
     queue::benchmark<pop,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<push_one,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<mh,t0,t1,t2,t3,t4,t5,t6,t7,t8>(iteration);
-
 }
 
+template<container c>
+struct benchmark{
+    benchmark(std::size_t size = 4):v(size){
+        dt = 0.025;
+        max_time = 50;
+        distribution = std::uniform_real_distribution<double>(0.5,2);
+        distribution_int = std::uniform_int_distribution<int>(0,size-1);
+    }
+
+    void operator()(size_t tid, size_t size = 1024){
+        bool state(false); // angry programmer
+        for(auto t=0.0; t < max_time; t += dt){
+            double value(0);
+
+            for(size_t i = 0; i < size ; ++i)
+                v.at(distribution_int(generator)).push((t + distribution(generator))); //mixup interevent + event
+
+            do {
+                state = try_pop(v.at(tid),value);
+                if(value > t){
+                    v.at(tid).push(t);
+                    state = false;
+                }
+            } while(state);
+
+            t += dt;
+        }
+    }
+
+    size_t size(){
+        return v.size();
+    }
+
+    double dt;
+    double max_time;
+    std::default_random_engine generator;
+    std::uniform_real_distribution<double> distribution;
+    std::uniform_int_distribution<int> distribution_int;
+    std::vector<typename helper_type<c>::value_type> v;
+};
+
 int main(int argc, char* argv[]){
-    int iteration = std::atoi(argv[1]);
-    sequential_benchmark(iteration);
+    //time
+    std::chrono::time_point<std::chrono::system_clock> start, end;
+    std::chrono::duration<double> elapsed_seconds;
+    //command line
+    size_t size = std::atoi(argv[1]);
+
+    {
+        benchmark<concurrent_priority_queue> a(size);
+        start = std::chrono::system_clock::now();
+            tbb::parallel_for( size_t(0), a.size(), [&](size_t i){a(i);} );
+        end = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end-start;
+        std::cout << "elapsed time parallel tbb: " << elapsed_seconds.count() << "[s]c\n";
+    }
+
+    {
+        benchmark<concurrent_priority_queue> a(size);
+        start = std::chrono::system_clock::now();
+        #pragm omp parallel for
+        for(int i=0; i < size; ++i)
+            a(i);
+        end = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end-start;
+        std::cout << "elapsed time parallel omp: " << elapsed_seconds.count() << "[s]c\n";
+    }
+
+    {
+        benchmark<priority_queue> a(size);
+        start = std::chrono::system_clock::now();
+        for(int i=0; i < size; ++i)
+            a(i);
+        end = std::chrono::system_clock::now();
+        elapsed_seconds = end-start;
+        std::cout << "elapsed time serial: " << elapsed_seconds.count() << "[s]c\n";
+    }
+
     return 0;
 }
