@@ -9,6 +9,10 @@
 #include <sstream>
 #include <iomanip>
 
+#if defined(_OPENMP)
+#include <omp.h>
+#endif
+
 #include "tbb/tbb.h"
 
 #include "timer_asm.h"
@@ -24,7 +28,7 @@ namespace queue{
 
 
     struct mhines_bench_helper {
-        
+
         template<class T>
         static double benchmark(int size, int repetition = 2){
             repetition=1;
@@ -173,16 +177,18 @@ int main(int argc, char* argv[]){
         std::cout << "elapsed time parallel tbb: " << elapsed_seconds.count() << "[s]c\n";
     }
 
+#if defined(_OPENMP)
     {
         benchmark<concurrent_priority_queue> a(size);
         start = std::chrono::system_clock::now();
-        #pragm omp parallel for
+        #pragma omp parallel for
         for(int i=0; i < size; ++i)
             a(i);
         end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = end-start;
         std::cout << "elapsed time parallel omp: " << elapsed_seconds.count() << "[s]c\n";
     }
+#endif
 
     {
         benchmark<priority_queue> a(size);
