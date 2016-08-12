@@ -43,7 +43,6 @@ namespace queue{
             unsigned long long int t1(0),t2(0),time(0);
 
             typename value_type::value_type value; // this is a double
-            bool state; // for try pop no really relevant with serial queue
 
             const double dt = 0.025;
             const double max_time = 50.0;
@@ -56,13 +55,8 @@ namespace queue{
                     for(int i = 0; i < size ; ++i)
                         queue.push((t + distribution(generator)));
 
-                    do {
-                        state = try_pop(queue,value);
-                        if(value > t){
-                            queue.push(t);
-                            state = false;
-                        }
-                    }while (state);
+                    while (queue.top() <= t)
+                        queue.pop();
 
                     t += dt;
                 }
@@ -118,7 +112,7 @@ void sequential_benchmark(int iteration = 10){
     queue::benchmark<push,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<pop,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<push_one,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
-    queue::benchmark<mh,t0,t1,t2,t3,t4,t5,t6,t7,t8>(iteration);
+    queue::benchmark<mh,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
 }
 
 template<class Q, class M = std::lock_guard<std::mutex>>
@@ -150,13 +144,11 @@ struct concurent_priority_queue{
         return (tid == my_id);
     }
 
-    bool dequeue(value_type& value){
+    bool dequeue(value_type& value,double t){
         mutex_type lock(tool::mtx);
-        bool b=!queue.empty();
-        if(b){
-            value=queue.top();
+        bool b= (!queue.empty() && queue.top() <= t);
+        if(b)
             queue.pop();
-        }
         return b;
     }
 
@@ -176,28 +168,19 @@ struct benchmark{
     }
 
     void operator()(size_t tid){
-        bool state(false); // angry programmer
         for(auto t=0.0; t < max_time; t += dt){
             double value(0);
 
+            for(size_t i = 0; i < size_event; ++i)
+                v.at(tid).enqueue(tid,(t + distribution(generator))); //mixup my event + interevent
 
-            //enqueue in CNeuron
             for(size_t i = 0; i < size_event/10; ++i)
                 v.at(distribution_int(generator)).enqueue(tid,(t + distribution(generator))); //mixup my event + interevent
 
+
             v.at(tid).merge();
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(10)); // we do something
-
-            //deliver event in CNeuron
-            do {
-                state = v.at(tid).dequeue(value);
-                if(value > t){
-                    v.at(tid).enqueue(tid,t);
-                    state = false;
-                    std::this_thread::sleep_for(std::chrono::milliseconds(10)); // we do something
-                }
-            } while(state);
+            while(v.at(tid).dequeue(value,t));
 
             t += dt;
         }
