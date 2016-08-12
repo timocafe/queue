@@ -5,6 +5,8 @@
 #include <chrono>
 #include <vector>
 #include <list>
+#include <stack>
+
 #include <set>
 #include <sstream>
 #include <thread>
@@ -15,6 +17,8 @@
 #endif
 
 #include "tbb/tbb.h"
+#include "locker.h"
+
 
 #include "timer_asm.h"
 
@@ -75,10 +79,6 @@ namespace queue{
     };
 
 
-
-
-
-
     template<class F, class ...T>
     void benchmark(int iteration, int size = 16){
 
@@ -121,29 +121,81 @@ void sequential_benchmark(int iteration = 10){
     queue::benchmark<mh,t0,t1,t2,t3,t4,t5,t6,t7,t8>(iteration);
 }
 
-template<container c>
+template<class Q, class M = std::lock_guard<std::mutex>>
+struct concurent_priority_queue{
+    typedef typename Q::value_type value_type;
+    typedef M mutex_type;
+
+    concurent_priority_queue(std::size_t tid):my_id(tid){}
+
+    void enqueue(size_t tid, value_type value){ // TO DO, more than double & and && version
+        if(iam(tid)) // I am myself push directly
+            queue.push(value);
+        else{ // I am not I am somebody else
+            mutex_type lock(tool::mtx);
+            inter_buffer.push(value);
+        }
+    }
+
+    void merge(){
+        mutex_type lock(tool::mtx); //lock guard pattern
+        while(!inter_buffer.empty()){
+            value_type value = inter_buffer.top();
+            queue.push(value);
+            inter_buffer.pop();
+        }
+    }
+
+    bool iam(std::size_t tid){
+        return (tid == my_id);
+    }
+
+    bool dequeue(value_type& value){
+        mutex_type lock(tool::mtx);
+        bool b=!queue.empty();
+        if(b){
+            value=queue.top();
+            queue.pop();
+        }
+        return b;
+    }
+
+    Q queue;
+    std::size_t my_id;
+    std::stack<value_type> inter_buffer;
+};
+
+template<container c> // works with all priority_queue
 struct benchmark{
-    benchmark(std::size_t size = 4):v(size){
+    benchmark(std::size_t group, std::size_t event=1024):size_group(group),size_event(event),v(group,0){
+        std::iota(v.begin(),v.end(),0); // give an id to every queue
         dt = 0.025;
         max_time = 50;
         distribution = std::uniform_real_distribution<double>(0.5,2);
-        distribution_int = std::uniform_int_distribution<int>(0,size-1);
+        distribution_int = std::uniform_int_distribution<int>(0,group-1);
     }
 
-    void operator()(size_t tid, size_t size = 1024){
+    void operator()(size_t tid){
         bool state(false); // angry programmer
         for(auto t=0.0; t < max_time; t += dt){
             double value(0);
 
-            for(size_t i = 0; i < size ; ++i)
-                v.at(distribution_int(generator)).push((t + distribution(generator))); //mixup interevent + event
 
+            //enqueue in CNeuron
+            for(size_t i = 0; i < size_event/10; ++i)
+                v.at(distribution_int(generator)).enqueue(tid,(t + distribution(generator))); //mixup my event + interevent
+
+            v.at(tid).merge();
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(10)); // we do something
+
+            //deliver event in CNeuron
             do {
-                state = try_pop(v.at(tid),value);
+                state = v.at(tid).dequeue(value);
                 if(value > t){
-                    v.at(tid).push(t);
+                    v.at(tid).enqueue(tid,t);
                     state = false;
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1)); // we do something
+                    std::this_thread::sleep_for(std::chrono::milliseconds(10)); // we do something
                 }
             } while(state);
 
@@ -155,15 +207,17 @@ struct benchmark{
         return v.size();
     }
 
+    std::size_t size_group, size_event;
     double dt;
     double max_time;
     std::default_random_engine generator;
     std::uniform_real_distribution<double> distribution;
     std::uniform_int_distribution<int> distribution_int;
-    std::vector<typename helper_type<c>::value_type> v;
+    std::vector<concurent_priority_queue<typename helper_type<c>::value_type>> v;
 };
 
 int main(int argc, char* argv[]){
+
     //time
     std::chrono::time_point<std::chrono::system_clock> start, end;
     std::chrono::duration<double> elapsed_seconds;
@@ -171,12 +225,12 @@ int main(int argc, char* argv[]){
     size_t size = std::atoi(argv[1]);
 
     {
-        benchmark<concurrent_priority_queue> a(size);
+        benchmark<priority_queue> a(size);
         start = std::chrono::system_clock::now();
             tbb::parallel_for( size_t(0), a.size(), [&](size_t i){a(i);} );
         end = std::chrono::system_clock::now();
-        std::chrono::duration<double> elapsed_seconds = end-start;
-        std::cout << "elapsed time parallel tbb: " << elapsed_seconds.count() << "[s]c\n";
+        elapsed_seconds = end-start;
+        std::cout << "elapsed time parallel tbb: " << elapsed_seconds.count() << "[s]\n";
     }
 
 #if defined(_OPENMP)
@@ -187,20 +241,20 @@ int main(int argc, char* argv[]){
         for(int i=0; i < size; ++i)
             a(i);
         end = std::chrono::system_clock::now();
-        std::chrono::duration<double> elapsed_seconds = end-start;
-        std::cout << "elapsed time parallel omp: " << elapsed_seconds.count() << "[s]c\n";
+        elapsed_seconds = end-start;
+        std::cout << "elapsed time parallel omp: " << elapsed_seconds.count() << "[s]\n";
     }
 #endif
 
-    {
-        benchmark<priority_queue> a(size);
-        start = std::chrono::system_clock::now();
-        for(int i=0; i < size; ++i)
-            a(i);
-        end = std::chrono::system_clock::now();
-        elapsed_seconds = end-start;
-        std::cout << "elapsed time serial: " << elapsed_seconds.count() << "[s]c\n";
-    }
+//    {
+//        benchmark<priority_queue> a(size);
+//        start = std::chrono::system_clock::now();
+//        for(int i=0; i < size; ++i)
+//            a(i);
+//        end = std::chrono::system_clock::now();
+//        elapsed_seconds = end-start;
+//        std::cout << "elapsed time serial: " << elapsed_seconds.count() << "[s]\n";
+//    }
 
     return 0;
 }

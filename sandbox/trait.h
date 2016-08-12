@@ -118,21 +118,47 @@ struct helper_type<concurrent_priority_queue>{
 
 //top does not exist with tbb because unsafe, so we use try pop
 
-    template<class Q>
-    bool try_pop(Q & queue, typename Q::value_type &value){
-        bool b=!queue.empty();
-        if(b){
-            value=queue.top();
-            queue.pop();
-        }
-        return b;
+template<class Q>
+bool try_pop(Q & queue, typename Q::value_type &value){
+    bool b=!queue.empty();
+    if(b){
+        value=queue.top();
+        queue.pop();
     }
+    return b;
+}
 
-    template<>
-    bool try_pop<tbb::concurrent_priority_queue<double, std::greater<double>>>
-        (tbb::concurrent_priority_queue<double, std::greater<double>> & queue,double &value){
-        return queue.try_pop(value);
-    }
+template<>
+bool try_pop<tbb::concurrent_priority_queue<double, std::greater<double>>>
+(tbb::concurrent_priority_queue<double, std::greater<double>> & queue,double &value){
+    return queue.try_pop(value);
+}
+
+//    template<class Q>
+//    bool dequeue(Q & queue, typename Q::value_type &value){
+//        bool b=!queue.empty();
+//        if(b){
+//            value=queue.top();
+//            queue.pop();
+//        }
+//        return b;
+//    }
+//
+//    template<>
+//    bool dequeue<tbb::concurrent_priority_queue<double, std::greater<double>>>
+//        (tbb::concurrent_priority_queue<double, std::greater<double>> & queue,double &value){
+//        return queue.try_pop(value);
+//    }
+//
+//    template<class Q>
+//    void enqueue(Q & queue, typename Q::value_type &&value){ //push_emplace ...
+//        queue.push(value);
+//    }
+//
+//    template<class Q>
+//    void enqueue(Q & queue, typename Q::value_type &value){
+//        queue.push(value);
+//    }
 
 
 #endif /* trait_h */
