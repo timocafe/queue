@@ -16,21 +16,17 @@
 #include <omp.h>
 #endif
 
-#include "tbb/tbb.h"
-#include "locker.h"
-
-
 #include "timer_asm.h"
 
 #include "sptq_queue.hpp"
 #include "bin_queue.hpp"
-
+#include "hybrid_queue.h"
 #include "trait.h"
+
 #include "push_pop.h" //benchmark push/pop
 
+#include "tbb/tbb.h"
 namespace queue{
-
-
 
     struct mhines_bench_helper {
 
@@ -41,8 +37,6 @@ namespace queue{
             std::default_random_engine generator;
             std::uniform_real_distribution<double> distribution(0.5,2.0);
             unsigned long long int t1(0),t2(0),time(0);
-
-            typename value_type::value_type value; // this is a double
 
             const double dt = 0.025;
             const double max_time = 50.0;
@@ -61,7 +55,6 @@ namespace queue{
                     t += dt;
                 }
 
-
                 t2 = rdtsc();
                 time += (t2 - t1);
             }
@@ -71,7 +64,6 @@ namespace queue{
 
         constexpr static auto name = "mh";
     };
-
 
     template<class F, class ...T>
     void benchmark(int iteration, int size = 16){
@@ -89,10 +81,34 @@ namespace queue{
         out.open(std::string(F::name) + ".csv",std::fstream::out);
         std::copy(res.begin(),res.end(), std::ostream_iterator<std::string>(out));
     }
+
+
+    // ok to make the glue with variadic template
+    struct parallel_helper{
+        template<class T> // T here is the queue type for the parallel
+        static double benchmark(int size=4){ // size it the number of entry for the thread bufffer or cell group for neuron
+            unsigned long long int t1(0),t2(0),time(0);
+            benchmark_partial_lockfree<T> a(size);
+            a.benchmark(0);
+            t1 = rdtsc();
+            tbb::parallel_for( size_t(0), size, [&](size_t i){ a.benchmark(i) ;} );
+            #ifdef _OPENMP
+            #pragma omp parallel for
+            for(int i=0; i < size; ++i)
+                a.benchmark(i);
+            #endif
+            t2 = rdtsc();
+            time = (t2 - t1);
+            return time;
+        };
+
+        constexpr static auto name = "toto";
+    };
+
 } // end name space
 
 //sequential benchmark to test the queue under serial mode
-void sequential_benchmark(int iteration = 10){
+void benchmarks(int iteration = 10){
     //queue types
     using t0 = helper_type<priority_queue>;
     using t1 = helper_type<sptq_queue>;
@@ -108,136 +124,32 @@ void sequential_benchmark(int iteration = 10){
     using pop = queue::pop_helper;
     using push_one = queue::push_one_helper;
     using mh = queue::mhines_bench_helper;
+    //parallel queue type on t0 only or t8
+    using qcpq = queue::concurent_priority_queue<t0>;
+    using qcplf = queue::concurent_partial_lock_free_priority_queue<t0>;
+    using qclfpq = queue::concurent_lock_free_priority_queue<t8>; // TBB ONLY !
+    // parallel bench
+    using mhth = queue::parallel_helper; // do the glue between 
     //benchmarks
-    queue::benchmark<push,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
-    queue::benchmark<pop,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
-    queue::benchmark<push_one,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
-    queue::benchmark<mh,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
+//    queue::benchmark<push,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
+//    queue::benchmark<pop,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
+//    queue::benchmark<push_one,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
+//    queue::benchmark<mh,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
+
+
+    queue::benchmark<mhth,t0>(4);
+
 }
 
-template<class Q, class M = std::lock_guard<std::mutex>>
-struct concurent_priority_queue{
-    typedef typename Q::value_type value_type;
-    typedef M mutex_type;
+namespace toto {
+void foo(size_t i){
+    std::cout << i << std::endl;
+}
+}
 
-    concurent_priority_queue(std::size_t tid):my_id(tid){}
-
-    void enqueue(size_t tid, value_type value){ // TO DO, more than double & and && version
-        if(iam(tid)) // I am myself push directly
-            queue.push(value);
-        else{ // I am not I am somebody else
-            mutex_type lock(tool::mtx);
-            inter_buffer.push(value);
-        }
-    }
-
-    void merge(){
-        mutex_type lock(tool::mtx); //lock guard pattern
-        while(!inter_buffer.empty()){
-            value_type value = inter_buffer.top();
-            queue.push(value);
-            inter_buffer.pop();
-        }
-    }
-
-    bool iam(std::size_t tid){
-        return (tid == my_id);
-    }
-
-    bool dequeue(value_type& value,double t){
-        mutex_type lock(tool::mtx);
-        bool b= (!queue.empty() && queue.top() <= t);
-        if(b)
-            queue.pop();
-        return b;
-    }
-
-    Q queue;
-    std::size_t my_id;
-    std::stack<value_type> inter_buffer;
-};
-
-template<container c> // works with all priority_queue
-struct benchmark{
-    benchmark(std::size_t group, std::size_t event=1024):size_group(group),size_event(event),v(group,0){
-        std::iota(v.begin(),v.end(),0); // give an id to every queue
-        dt = 0.025;
-        max_time = 50;
-        distribution = std::uniform_real_distribution<double>(0.5,2);
-        distribution_int = std::uniform_int_distribution<int>(0,group-1);
-    }
-
-    void operator()(size_t tid){
-        for(auto t=0.0; t < max_time; t += dt){
-            double value(0);
-
-            for(size_t i = 0; i < size_event; ++i)
-                v.at(tid).enqueue(tid,(t + distribution(generator))); //mixup my event + interevent
-
-            for(size_t i = 0; i < size_event/10; ++i)
-                v.at(distribution_int(generator)).enqueue(tid,(t + distribution(generator))); //mixup my event + interevent
-
-
-            v.at(tid).merge();
-
-            while(v.at(tid).dequeue(value,t));
-
-            t += dt;
-        }
-    }
-
-    size_t size(){
-        return v.size();
-    }
-
-    std::size_t size_group, size_event;
-    double dt;
-    double max_time;
-    std::default_random_engine generator;
-    std::uniform_real_distribution<double> distribution;
-    std::uniform_int_distribution<int> distribution_int;
-    std::vector<concurent_priority_queue<typename helper_type<c>::value_type>> v;
-};
 
 int main(int argc, char* argv[]){
-
-    //time
-    std::chrono::time_point<std::chrono::system_clock> start, end;
-    std::chrono::duration<double> elapsed_seconds;
-    //command line
-    size_t size = std::atoi(argv[1]);
-
-    {
-        benchmark<priority_queue> a(size);
-        start = std::chrono::system_clock::now();
-            tbb::parallel_for( size_t(0), a.size(), [&](size_t i){a(i);} );
-        end = std::chrono::system_clock::now();
-        elapsed_seconds = end-start;
-        std::cout << "elapsed time parallel tbb: " << elapsed_seconds.count() << "[s]\n";
-    }
-
-#if defined(_OPENMP)
-    {
-        benchmark<concurrent_priority_queue> a(size);
-        start = std::chrono::system_clock::now();
-        #pragma omp parallel for
-        for(int i=0; i < size; ++i)
-            a(i);
-        end = std::chrono::system_clock::now();
-        elapsed_seconds = end-start;
-        std::cout << "elapsed time parallel omp: " << elapsed_seconds.count() << "[s]\n";
-    }
-#endif
-
-//    {
-//        benchmark<priority_queue> a(size);
-//        start = std::chrono::system_clock::now();
-//        for(int i=0; i < size; ++i)
-//            a(i);
-//        end = std::chrono::system_clock::now();
-//        elapsed_seconds = end-start;
-//        std::cout << "elapsed time serial: " << elapsed_seconds.count() << "[s]\n";
-//    }
-
+   int rep = atoi(argv[1]);
+   benchmarks(rep);
     return 0;
 }
