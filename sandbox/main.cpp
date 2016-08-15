@@ -60,23 +60,25 @@ void benchmarks(int iteration = 10){
     using t5 = helper_type<pairing_heap>;
     using t6 = helper_type<skew_heap>;
     using t7 = helper_type<d_ary_heap>;
-    using t8 = helper_type<concurrent_priority_queue>;
     //queue types parallel
     using tp0 = helper_parallel_type<concurrent_priority_queue>;
-
+    using tp1 = helper_parallel_type<priority_queue>;
+    using tp2 = helper_parallel_type<concurrent_stack>;
     //bench types
     using push = queue::push_helper;
     using pop = queue::pop_helper;
     using push_one = queue::push_one_helper;
     using mh = queue::mhines_bench_helper;
     using mh_lockfree = queue::benchmark_lockfree;
+    using mh_partial_lockfree  = queue::benchmark_partial_lockfree;
 
     //benchmarks
     queue::benchmark<push,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<pop,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<push_one,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<mh,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
-    queue::benchmark<mh_lockfree,tp0>(iteration);
+    queue::benchmark<mh_lockfree,tp0>(iteration); // tbn::priority_queue here only
+    queue::benchmark<mh_partial_lockfree,tp1,tp2>(iteration);
 
 
 //    queue::benchmark<mhth,bench_lockfree>(5,1,"lockfree");

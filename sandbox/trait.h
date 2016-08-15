@@ -18,7 +18,7 @@
 #include "tbb/concurrent_priority_queue.h"
 
 enum container {sptq_queue, bin_queue, priority_queue,binomial_heap,
-                fibonacci_heap,pairing_heap,skew_heap,d_ary_heap,concurrent_priority_queue};
+                fibonacci_heap,pairing_heap,skew_heap,d_ary_heap,concurrent_priority_queue,concurrent_stack};
 
 //name helper printer
 template<class D, class... T>
@@ -122,7 +122,19 @@ struct helper_parallel_type;
 template<>
 struct helper_parallel_type<concurrent_priority_queue>{
     typedef queue::concurent_lock_free_priority_queue<helper_type<concurrent_priority_queue>::value_type > value_type;
-    constexpr static auto name = "tbb::concurrent_priority_queue";
+    constexpr static auto name = "lock_free_tbb::concurrent_priority_queue";
+};
+
+template<>
+struct helper_parallel_type<priority_queue>{
+    typedef queue::concurent_priority_queue<helper_type<priority_queue>::value_type > value_type;
+    constexpr static auto name = "mutex_priority_queue";
+};
+
+template<>
+struct helper_parallel_type<concurrent_stack>{
+    typedef queue::concurent_partial_lock_free_priority_queue<helper_type<priority_queue>::value_type > value_type;
+    constexpr static auto name = "boost::concurrent_priority_queue";
 };
 
 

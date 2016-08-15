@@ -15,7 +15,7 @@ struct concurent_priority_queue{
     typedef typename Q::value_type value_type;
     typedef M mutex_type;
 
-    concurent_priority_queue(std::size_t tid):my_id(tid){}
+    concurent_priority_queue():my_id(0){}
 
     void enqueue(size_t tid, value_type value){ // TO DO, more than double & and && version
         mutex_type lock(tool::mtx);
@@ -58,7 +58,7 @@ struct concurent_partial_lock_free_priority_queue{
     typedef typename Q::value_type value_type;
     typedef M mutex_type;
 
-    concurent_partial_lock_free_priority_queue(std::size_t tid):my_id(tid){}
+    concurent_partial_lock_free_priority_queue():my_id(0){}
 
     void enqueue(size_t tid, value_type value){ // TO DO, more than double & and && version
         if(iam(tid)) // I am myself push directly
