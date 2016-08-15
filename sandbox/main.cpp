@@ -81,10 +81,6 @@ void benchmarks(int iteration = 10){
     queue::benchmark<mh_partial_lockfree,tp1,tp2>(iteration);
 
 
-//    queue::benchmark<mhth,bench_lockfree>(5,1,"lockfree");
-//    queue::benchmark<mhth,bench_partial_lockfree>(5,1,"partial_lockfree");
-
-
 }
 
 int main(int argc, char* argv[]){

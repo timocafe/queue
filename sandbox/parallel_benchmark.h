@@ -24,7 +24,7 @@ struct benchmark_partial_lockfree{
 
         t1 = rdtsc();
 
-        tbb::parallel_for( size_t(0), size, [&](size_t tid){
+        tbb::parallel_for( size_t(0),  v_queue.size(), [&](size_t tid){
             for(auto t=0.0; t < max_time; t += dt){
                 double value(0);
 
@@ -65,7 +65,7 @@ struct benchmark_lockfree{
         std::vector<value_type> v_queue(100); // vector or queue
         t1 = rdtsc();
 
-        tbb::parallel_for( size_t(0), size, [&](size_t tid){
+        tbb::parallel_for( size_t(0), v_queue.size(), [&](size_t tid){
             for(auto t=0.0; t < max_time; t += dt){
                 double value(0);
 
