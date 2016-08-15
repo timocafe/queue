@@ -2,6 +2,7 @@
 #ifndef hybrid_queue_h
 #define hybrid_queue_h
 
+#include <thread>
 #include <boost/lockfree/stack.hpp>
 #include "tbb/tbb.h"
 #include "locker.h"
@@ -11,7 +12,7 @@
 namespace queue{
 
 //pure mutex version, the queue can be whatever you want
-template<class Q, class M = std::lock_guard<std::mutex>>
+template<class Q, class M = std::lock_guard<tool::omp_mutex> >
 struct concurent_priority_queue{
     typedef typename Q::value_type value_type;
     typedef M mutex_type;
@@ -54,7 +55,7 @@ struct concurent_priority_queue{
 };
 
 // hybrid version where I use a lock free boost stack
-template<class Q, class M = std::lock_guard<std::mutex>>
+template<class Q, class M = std::lock_guard<tool::omp_mutex>>
 struct concurent_partial_lock_free_priority_queue{
     typedef typename Q::value_type value_type;
     typedef M mutex_type;

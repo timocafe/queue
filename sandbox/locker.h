@@ -13,6 +13,8 @@
 #include "omp.h"
 #endif
 
+#include  <mutex>
+
 namespace tool{
 
 #ifdef _OPENMP
@@ -26,11 +28,11 @@ namespace tool{
         }
 
         void lock(){
-            omp_set_lock(omp_mtx);
+            omp_set_lock(&omp_mtx);
         }
 
         void unlock(){
-            omp_unset_lock(omp_mtx);
+            omp_unset_lock(&omp_mtx);
         }
 
         omp_lock_t omp_mtx;
@@ -40,6 +42,6 @@ namespace tool{
 #else
     std::mutex mtx;
 #endif
-    
+
 } //end namespace
 #endif /* locker_h */

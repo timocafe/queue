@@ -91,7 +91,7 @@ namespace queue{
             benchmark_partial_lockfree<T> a(size);
             a.benchmark(0);
             t1 = rdtsc();
-            tbb::parallel_for( size_t(0), size, [&](size_t i){ a.benchmark(i) ;} );
+//          tbb::parallel_for( size_t(0), size, [&](size_t i){ a.benchmark(i) ;} );
             #ifdef _OPENMP
             #pragma omp parallel for
             for(int i=0; i < size; ++i)
