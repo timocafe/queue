@@ -21,13 +21,11 @@ struct concurent_priority_queue{
         mutex_type lock(tool::mtx);
         if(iam(tid)) // I am myself push directly
             queue.push(value);
-        else{ // I am not I am somebody else
+        else // I am not I am somebody else
             inter_buffer.push(value);
-        }
     }
 
     void merge(){
-        mutex_type lock(tool::mtx); //lock guard pattern
         while(!inter_buffer.empty()){
             value_type value = inter_buffer.top();
             queue.push(value);
@@ -41,6 +39,7 @@ struct concurent_priority_queue{
 
     bool dequeue(value_type& value,double t){
         mutex_type lock(tool::mtx);
+        merge();
         bool b = (!queue.empty() && queue.top() <= t);
         if(b)
             queue.pop();
@@ -81,6 +80,8 @@ struct concurent_partial_lock_free_priority_queue{
     }
 
     bool dequeue(value_type& value,double t){
+        merge();
+    
         bool b = (!queue.empty() && queue.top() <= t);
         if(b)
             queue.pop();

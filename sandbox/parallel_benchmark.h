@@ -31,8 +31,6 @@ struct benchmark_partial_lockfree{
                 for(size_t i = 0; i < size; ++i)
                     v_queue.at(distribution_int(generator)).enqueue(tid,(t + distribution(generator))); //mixup my event + interevent
 
-                v_queue.at(tid).merge();
-
                 while(v_queue.at(tid).dequeue(value,t));
 
                 t += dt;
