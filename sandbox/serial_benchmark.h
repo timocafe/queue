@@ -6,8 +6,8 @@
 //
 //
 
-#ifndef push_pop_h
-#define push_pop_h
+#ifndef serial_benchmark_h
+#define serial_benchmark_h
 
 namespace queue{
 
@@ -87,6 +87,43 @@ namespace queue{
         }
 
         constexpr static auto name = "push_one";
+    };
+
+    struct mhines_bench_helper {
+
+        template<class T>
+        static double benchmark(int size, int repetition = 2){
+            repetition=1;
+            using value_type = typename T::value_type;
+            std::default_random_engine generator;
+            std::uniform_real_distribution<double> distribution(0.5,2.0);
+            unsigned long long int t1(0),t2(0),time(0);
+
+            const double dt = 0.025;
+            const double max_time = 50.0;
+
+            for(int j=0; j<repetition; ++j){
+                value_type queue;
+                t1 = rdtsc();
+
+                for(auto t=0.0; t < max_time; t += dt){
+                    for(int i = 0; i < size ; ++i)
+                        queue.push((t + distribution(generator)));
+
+                    while (queue.top() <= t)
+                        queue.pop();
+
+                    t += dt;
+                }
+
+                t2 = rdtsc();
+                time += (t2 - t1);
+            }
+
+            return time*1/static_cast<double>(repetition);
+        }
+        
+        constexpr static auto name = "mh";
     };
     
 } //end namespace

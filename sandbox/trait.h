@@ -57,6 +57,7 @@ struct benchmark_helper{
     }
 };
 
+//serial queue
 template<container q>
 struct helper_type;
 
@@ -113,5 +114,19 @@ struct helper_type<concurrent_priority_queue>{
     typedef tbb::concurrent_priority_queue<double, std::greater<double>>  value_type;
     constexpr static auto name = "tbb::concurrent_priority_queue";
 };
+
+//serial queue
+template<container q>
+struct helper_parallel_type;
+
+template<>
+struct helper_parallel_type<concurrent_priority_queue>{
+    typedef queue::concurent_lock_free_priority_queue<helper_type<concurrent_priority_queue>::value_type > value_type;
+    constexpr static auto name = "tbb::concurrent_priority_queue";
+};
+
+
+
+
 
 #endif /* trait_h */
