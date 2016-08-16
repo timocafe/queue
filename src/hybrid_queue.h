@@ -52,9 +52,6 @@ struct concurent_priority_queue{
     std::stack<value_type> inter_buffer;
 };
 
-
-std::atomic<bool> done (false);
-
 // hybrid version where I use a lock free boost stack
 template<class Q, class M = std::lock_guard<std::mutex>>
 struct concurent_partial_lock_free_priority_queue{
@@ -92,7 +89,7 @@ struct concurent_partial_lock_free_priority_queue{
 
     container_type queue;
     std::size_t my_id;
-    boost::lockfree::stack<double,boost::lockfree::fixed_sized<true>, boost::lockfree::capacity<1000> > inter_buffer;
+    boost::lockfree::stack<double,boost::lockfree::fixed_sized<true>, boost::lockfree::capacity<10000> > inter_buffer;
 };
 
 // put lock free version
