@@ -10,7 +10,7 @@ struct benchmark_partial_lockfree{
         using value_type = typename T::value_type;
         std::default_random_engine generator;
         std::uniform_real_distribution<double> distribution(0.5,2.0);
-        std::uniform_int_distribution<int> distribution_int(0.0,3);
+        std::uniform_int_distribution<int> distribution_int(0,99);
 
         unsigned long long int t1(0),t2(0),time(0);
         const double dt = 0.025;
@@ -19,7 +19,7 @@ struct benchmark_partial_lockfree{
         std::vector<value_type> v_queue(100); // vector or queue
 
         tbb::parallel_for( size_t(0), v_queue.size(), [&](size_t tid){
-            v_queue[tid].my_id = distribution_int(generator);
+            v_queue[tid].my_id = tid;
         }); //end lambda
 
         t1 = rdtsc();
@@ -30,6 +30,8 @@ struct benchmark_partial_lockfree{
 
                 for(size_t i = 0; i < size; ++i)
                     v_queue.at(distribution_int(generator)).enqueue(tid,(t + distribution(generator))); //mixup my event + interevent
+
+                v_queue.at(tid).merge();
 
                 while(v_queue.at(tid).dequeue(value,t))
 
@@ -54,7 +56,7 @@ struct benchmark_lockfree{
         using value_type = typename T::value_type;
         std::default_random_engine generator;
         std::uniform_real_distribution<double> distribution(0.5,2.0);
-        std::uniform_int_distribution<int> distribution_integer(0,3);
+        std::uniform_int_distribution<int> distribution_int(0,99);
 
         unsigned long long int t1(0),t2(0),time(0);
         const double dt = 0.025;
@@ -66,8 +68,11 @@ struct benchmark_lockfree{
         for(auto t=0.0; t < max_time; t += dt){
             tbb::parallel_for( size_t(0), v_queue.size(), [&](size_t tid){
                 double value(0);
+
                 for(size_t i = 0; i < size; ++i)
-                    v_queue.at(distribution_integer(generator)).enqueue((t + distribution(generator))); //mixup my event + interevent
+                    v_queue.at(distribution_int(generator)).enqueue((t + distribution(generator))); //mixup my event + interevent
+
+
                 while(v_queue.at(tid).dequeue(value,t))
 
                 t += dt;

@@ -12,20 +12,23 @@ namespace queue{
 //pure mutex version, the queue can be whatever you want
 template<class Q, class M = std::lock_guard<std::mutex> >
 struct concurent_priority_queue{
+    typedef Q container_type;
     typedef typename Q::value_type value_type;
     typedef M mutex_type;
 
     concurent_priority_queue():my_id(0){}
 
     void enqueue(size_t tid, value_type value){ // TO DO, more than double & and && version
-        mutex_type lock(tool::mtx);
         if(iam(tid)) // I am myself push directly
             queue.push(value);
-        else // I am not I am somebody else
+        else { /* I am not I am somebody else */
+            mutex_type lock(tool::mtx);
             inter_buffer.push(value);
+        }
     }
 
     void merge(){
+        mutex_type lock(tool::mtx); //lock guard pattern
         while(!inter_buffer.empty()){
             value_type value = inter_buffer.top();
             queue.push(value);
@@ -38,22 +41,24 @@ struct concurent_priority_queue{
     }
 
     bool dequeue(value_type& value,double t){
-        mutex_type lock(tool::mtx);
-        merge();
         bool b = (!queue.empty() && queue.top() <= t);
         if(b)
-            queue.pop();
+            queue.pop(); 
         return b;
     }
 
-    Q queue;
+    container_type queue;
     std::size_t my_id;
     std::stack<value_type> inter_buffer;
 };
 
+
+std::atomic<bool> done (false);
+
 // hybrid version where I use a lock free boost stack
 template<class Q, class M = std::lock_guard<std::mutex>>
 struct concurent_partial_lock_free_priority_queue{
+    typedef Q container_type;
     typedef typename Q::value_type value_type;
     typedef M mutex_type;
 
@@ -63,16 +68,15 @@ struct concurent_partial_lock_free_priority_queue{
         if(iam(tid)) // I am myself push directly
             queue.push(value);
         else // I am not I am somebody else
-            inter_buffer.push(value);
+            while(!inter_buffer.push(value))
+                ;
     }
 
     void merge(){
         mutex_type lock(tool::mtx); //lock guard pattern
-        while(!inter_buffer.empty()){
-            value_type value;
-            inter_buffer.pop(value);
+        value_type value;
+        while(inter_buffer.pop(value))
             queue.push(value);
-        }
     }
 
     bool iam(std::size_t tid){
@@ -80,15 +84,13 @@ struct concurent_partial_lock_free_priority_queue{
     }
 
     bool dequeue(value_type& value,double t){
-        merge();
-    
         bool b = (!queue.empty() && queue.top() <= t);
         if(b)
             queue.pop();
         return b;
     }
 
-    Q queue;
+    container_type queue;
     std::size_t my_id;
     boost::lockfree::stack<double,boost::lockfree::fixed_sized<true>, boost::lockfree::capacity<1000> > inter_buffer;
 };
