@@ -15,8 +15,10 @@
 #include <boost/heap/fibonacci_heap.hpp>
 #include <boost/heap/pairing_heap.hpp>
 #include <boost/heap/skew_heap.hpp>
+#include "tbb/concurrent_priority_queue.h"
 
-enum container {sptq_queue, bin_queue, priority_queue,binomial_heap,fibonacci_heap,pairing_heap,skew_heap,d_ary_heap};
+enum container {sptq_queue, bin_queue, priority_queue,binomial_heap,
+                fibonacci_heap,pairing_heap,skew_heap,d_ary_heap,concurrent_priority_queue,concurrent_stack};
 
 //name helper printer
 template<class D, class... T>
@@ -55,6 +57,7 @@ struct benchmark_helper{
     }
 };
 
+//serial queue
 template<container q>
 struct helper_type;
 
@@ -100,12 +103,42 @@ struct helper_type<skew_heap>{
     constexpr static auto name = "boost::skew_heap";
 };
 
-
 template<>
 struct helper_type<d_ary_heap>{
     typedef boost::heap::d_ary_heap<double,boost::heap::arity<16>, boost::heap::compare<std::greater<double>>> value_type;
     constexpr static auto name = "boost::d_ary_heap";
 };
+
+template<>
+struct helper_type<concurrent_priority_queue>{
+    typedef tbb::concurrent_priority_queue<double, std::greater<double>>  value_type;
+    constexpr static auto name = "tbb::concurrent_priority_queue";
+};
+
+//serial queue
+template<container q>
+struct helper_parallel_type;
+
+template<>
+struct helper_parallel_type<concurrent_priority_queue>{
+    typedef queue::concurent_lock_free_priority_queue<helper_type<concurrent_priority_queue>::value_type > value_type;
+    constexpr static auto name = "lock_free_tbb::concurrent_priority_queue";
+};
+
+template<>
+struct helper_parallel_type<priority_queue>{
+    typedef queue::concurent_priority_queue<helper_type<priority_queue>::value_type > value_type;
+    constexpr static auto name = "mutex_priority_queue";
+};
+
+template<>
+struct helper_parallel_type<concurrent_stack>{
+    typedef queue::concurent_partial_lock_free_priority_queue<helper_type<priority_queue>::value_type > value_type;
+    constexpr static auto name = "boost::concurrent_priority_queue";
+};
+
+
+
 
 
 #endif /* trait_h */

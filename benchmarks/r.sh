@@ -1,6 +1,7 @@
 #!/bin/bash -a
 
-for i in E2670 PowerA2 i5
+#for i in E2670 PowerA2 i5
+for i in i5
 do
     cp plot.txt data_core_${i}
     cd data_core_${i}
@@ -21,10 +22,11 @@ do
     esac
     gnuplot plot.txt
     epstopdf mh.eps --outfile mh_$i.pdf
+    epstopdf mhth.eps --outfile mhth_$i.pdf
     epstopdf pop.eps --outfile pop_$i.pdf
     epstopdf push.eps --outfile push_$i.pdf
     epstopdf single.eps --outfile single_$i.pdf
-    gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=merged_$i.pdf mh_$i.pdf pop_$i.pdf push_$i.pdf single_$i.pdf
+    gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=merged_$i.pdf mhth_$i.pdf mh_$i.pdf pop_$i.pdf push_$i.pdf single_$i.pdf
     open merged_$i.pdf
     cd ..
 done

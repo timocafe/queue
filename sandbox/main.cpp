@@ -5,59 +5,35 @@
 #include <chrono>
 #include <vector>
 #include <list>
+#include <stack>
+
 #include <set>
 #include <sstream>
+#include <thread>
 #include <iomanip>
+
+#if defined(_OPENMP)
+#include <omp.h>
+#endif
 
 #include "timer_asm.h"
 
 #include "sptq_queue.hpp"
 #include "bin_queue.hpp"
-
+#include "hybrid_queue.h"
 #include "trait.h"
-#include "push_pop.h" //benchmark push/pop
+
+#include "serial_benchmark.h" //benchmark push/pop
+#include "parallel_benchmark.h" //benchmark mh //
 
 
+#include "tbb/tbb.h"
 
 namespace queue{
 
-
-    struct mhines_bench_helper {
-        template<class T>
-        static double benchmark(int size, int repetition = 2){
-            repetition=1;
-            using value_type = typename T::value_type;
-            std::default_random_engine generator;
-            std::uniform_real_distribution<double> distribution(0.5,2.0);
-            unsigned long long int t1(0),t2(0),time(0);
-
-            const double dt = 0.025;
-            const double max_time = 50.0;
-
-            for(int j=0; j<repetition; ++j){
-                value_type queue;
-                t1 = rdtsc();
-                for(auto t=0.0; t < max_time; t += dt){
-                    for(int i = 0; i < size ; ++i)
-                        queue.push(t + distribution(generator));
-
-                    while (queue.top() <= t)
-                        queue.pop();
-
-                    t += dt;
-                }
-                t2 = rdtsc();
-                time += (t2 - t1);
-            }
-            return time*1/static_cast<double>(repetition);
-        }
-
-        constexpr static auto name = "mh";
-    };
-
     template<class F, class ...T>
-    void benchmark(int iteration, int size = 1){
-
+    void benchmark(int iteration, int size = 1, std::string prefix = std::string()){
+        std::string filename = std::string(prefix+F::name) + ".csv";
         std::list<std::string> res(1,"#elements," + name_helper<T...>::name() + "\n");
 
         for(int i=1; i< iteration; ++i){
@@ -68,14 +44,14 @@ namespace queue{
         }
         //start IO
         std::fstream out;
-        out.open(std::string(F::name) + ".csv",std::fstream::out);
+        out.open(filename,std::fstream::out);
         std::copy(res.begin(),res.end(), std::ostream_iterator<std::string>(out));
     }
 } // end name space
 
 //sequential benchmark to test the queue under serial mode
-void sequential_benchmark(int iteration = 10){
-    //queue types
+void benchmarks(int iteration = 10){
+    //queue types serial
     using t0 = helper_type<priority_queue>;
     using t1 = helper_type<sptq_queue>;
     using t2 = helper_type<bin_queue>;
@@ -84,20 +60,26 @@ void sequential_benchmark(int iteration = 10){
     using t5 = helper_type<pairing_heap>;
     using t6 = helper_type<skew_heap>;
     using t7 = helper_type<d_ary_heap>;
+    //queue types parallel
+    using tp0 = helper_parallel_type<priority_queue>; // pure mutex + stack
+    using tp1 = helper_parallel_type<concurrent_stack>; //  // less mutex + boost::stack
+    using tp2 = helper_parallel_type<concurrent_priority_queue>; // tbb
     //bench types
     using push = queue::push_helper;
     using pop = queue::pop_helper;
     using push_one = queue::push_one_helper;
     using mh = queue::mhines_bench_helper;
+    using mh_partial_lockfree  = queue::benchmark_partial_lockfree;
     //benchmarks
     queue::benchmark<push,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<pop,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<push_one,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<mh,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
+    queue::benchmark<mh_partial_lockfree,tp0,tp1,tp2>(iteration);
 }
 
 int main(int argc, char* argv[]){
-    int iteration = std::atoi(argv[1]);
-    sequential_benchmark(iteration);
+    int rep = atoi(argv[1]);
+    benchmarks(rep);
     return 0;
 }
