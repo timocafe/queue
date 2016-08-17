@@ -67,9 +67,9 @@ set out "single.eps";replot "push_one.csv" u 1:($9/FREQ) w l lw 2 t 'boost::d\_a
 
 set xlabel "Number of events pushed to the queue during one timestep"
 set title '(e)Parallel Benchmark suggested by M. Hines with inter event - NAME'
-set out "mhth.eps";plot   "mhth.csv" u 1:($2/FREQ) w l lw 2 t 'tbb::priority\_queue'
-set out "mhth.eps";replot "mhth.csv" u 1:($3/FREQ) w l lw 2 t 'mutex std::stack'
-set out "mhth.eps";replot "mhth.csv" u 1:($4/FREQ) w l lw 2 t 'boost::lockfree::stack'
+set out "mhth.eps";plot   "mhth.csv" u 1:($2/FREQ) w l lw 2 t 'std::stack'
+set out "mhth.eps";replot "mhth.csv" u 1:($3/FREQ) w l lw 2 t 'boost::lockfree'
+set out "mhth.eps";replot "mhth.csv" u 1:($4/FREQ) w l lw 2 t 'tbb::priority\_queue'
 set out "mhth.eps";replot "limit.csv" u 1:2  ls 1 notitle
 set out "mhth.eps";replot "limit.csv" u 1:2  ls 1 w l notitle
 set out "mhth.eps";replot "limit.csv" u 3:4  ls 2 notitle
