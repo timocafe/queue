@@ -14,6 +14,7 @@
 #endif
 
 #include  <mutex>
+#include <thread>
 
 namespace tool{
 
@@ -39,7 +40,9 @@ namespace tool{
     };
 
     omp_mutex mtx; // global object
+    typedef omp_mutex QUEUE_MUTEX_TYPE;
 #else
+    typedef std::mutex QUEUE_MUTEX_TYPE;
     std::mutex mtx;
 #endif
 

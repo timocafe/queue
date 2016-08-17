@@ -10,7 +10,7 @@
 namespace queue{
 
 //pure mutex version, the queue can be whatever you want
-template<class Q, class M = std::lock_guard<std::mutex> >
+    template<class Q, class M = std::lock_guard<tool::QUEUE_MUTEX_TYPE>>
 struct concurent_priority_queue{
     typedef Q container_type;
     typedef typename Q::value_type value_type;
@@ -53,7 +53,7 @@ struct concurent_priority_queue{
 };
 
 // hybrid version where I use a lock free boost stack
-template<class Q, class M = std::lock_guard<std::mutex>>
+template<class Q, class M = std::lock_guard<tool::QUEUE_MUTEX_TYPE>>
 struct concurent_partial_lock_free_priority_queue{
     typedef Q container_type;
     typedef typename Q::value_type value_type;
