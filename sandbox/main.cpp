@@ -33,7 +33,7 @@ namespace queue{
 
     template<class F, class ...T>
     void benchmark(int iteration, int size = 1, std::string prefix = std::string()){
-
+        std::string filename = std::string(prefix+F::name) + ".csv";
         std::list<std::string> res(1,"#elements," + name_helper<T...>::name() + "\n");
 
         for(int i=1; i< iteration; ++i){
@@ -44,7 +44,7 @@ namespace queue{
         }
         //start IO
         std::fstream out;
-        out.open(std::string(prefix+F::name) + ".csv",std::fstream::out);
+        out.open(filename,std::fstream::out);
         std::copy(res.begin(),res.end(), std::ostream_iterator<std::string>(out));
     }
 } // end name space

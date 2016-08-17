@@ -16,7 +16,7 @@ struct concurent_priority_queue{
     typedef typename Q::value_type value_type;
     typedef M mutex_type;
 
-    concurent_priority_queue():my_id(0){}
+    concurent_priority_queue():my_id(0){} // my id must be independenant i.e. the entry of the vectotr
 
     void enqueue(size_t tid, value_type value){ // TO DO, more than double & and && version
         if(iam(tid)) // I am myself push directly
@@ -89,7 +89,7 @@ struct concurent_partial_lock_free_priority_queue{
 
     container_type queue;
     std::size_t my_id;
-    boost::lockfree::stack<double,boost::lockfree::fixed_sized<true>, boost::lockfree::capacity<10000> > inter_buffer;
+    boost::lockfree::stack<double> inter_buffer;
 };
 
 // put lock free version
