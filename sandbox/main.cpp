@@ -24,7 +24,7 @@
 #include "trait.h"
 
 #include "serial_benchmark.h" //benchmark push/pop
-#include "parallel_benchmark.h" //benchmark push/pop
+#include "parallel_benchmark.h" //benchmark mh //
 
 
 #include "tbb/tbb.h"
@@ -61,26 +61,21 @@ void benchmarks(int iteration = 10){
     using t6 = helper_type<skew_heap>;
     using t7 = helper_type<d_ary_heap>;
     //queue types parallel
-    using tp0 = helper_parallel_type<concurrent_priority_queue>;
-    using tp1 = helper_parallel_type<priority_queue>;
-    using tp2 = helper_parallel_type<concurrent_stack>;
+    using tp0 = helper_parallel_type<priority_queue>; // pure mutex + stack
+    using tp1 = helper_parallel_type<concurrent_stack>; //  // less mutex + boost::stack
+    using tp2 = helper_parallel_type<concurrent_priority_queue>; // tbb
     //bench types
     using push = queue::push_helper;
     using pop = queue::pop_helper;
     using push_one = queue::push_one_helper;
     using mh = queue::mhines_bench_helper;
-//    using mh_lockfree = queue::benchmark_lockfree;
     using mh_partial_lockfree  = queue::benchmark_partial_lockfree;
-
     //benchmarks
     queue::benchmark<push,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<pop,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<push_one,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<mh,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
-    //queue::benchmark<mh_lockfree,tp0>(iteration); // tbn::priority_queue here only
     queue::benchmark<mh_partial_lockfree,tp0,tp1,tp2>(iteration);
-
-
 }
 
 int main(int argc, char* argv[]){
