@@ -19,6 +19,10 @@ do
         sed -i -e "s/NAME/${i}-2.5[GHz]-CLANG3.6/g" plot.txt
         sed -i -e "s/FREQ/2.5*10**-9/g" plot.txt
         ;;
+        P8)
+        sed -i -e "s/NAME/${i}-2.992[GHz]-GCC5.2/g" plot.txt
+        sed -i -e "s/FREQ/2.992*10**-9/g" plot.txt
+        ;;
     esac
     gnuplot plot.txt
     epstopdf mh.eps --outfile mh_$i.pdf

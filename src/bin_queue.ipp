@@ -23,7 +23,7 @@ namespace tool{
         if(idt >= bins_.size())
             bins_.resize(idt<<1); //double the size
         assert(idt >= 0);
-        idt += qpt_;
+//        idt += qpt_;
 //        if (idt >= bins_.size()) { idt -= bins_.size(); } // is it relevant now ?
 //        assert (idt < bins_.size());
         q->cnt_ = idt; // only for iteration
@@ -33,8 +33,9 @@ namespace tool{
 
     template<class T>
     tool::node<T>* bin_queue<T>::first() {
-        for (int i = 0; i < bins_.size(); ++i) {
+        for (int i = qpt_; i < bins_.size(); ++i) {
             if (bins_[i]) {
+                qpt_ = i; // keep track of the first bin
                 return bins_[i];
             }
         }

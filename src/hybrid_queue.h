@@ -81,6 +81,7 @@ struct concurent_partial_lock_free_priority_queue{
     }
 
     bool dequeue(value_type& value,double t){
+        merge();
         bool b = (!queue.empty() && queue.top() <= t);
         if(b)
             queue.pop();
@@ -98,7 +99,7 @@ struct concurent_lock_free_priority_queue{
     typedef Q container_type;
     typedef typename Q::value_type value_type;
 
-    void enqueue(value_type value){ // TO DO, more than double & and && version
+    void enqueue(size_t tid = 0, value_type value = 0){ // tid u
         queue.push(value);
     }
 
@@ -111,6 +112,7 @@ struct concurent_lock_free_priority_queue{
         return b;
     }
 
+    std::size_t my_id;
     container_type queue;
 };
 
