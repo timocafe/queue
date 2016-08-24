@@ -23,6 +23,8 @@ namespace tool{
         if(idt >= bins_.size())
             bins_.resize(idt<<1); //double the size
         assert(idt >= 0);
+        if(idt < qpt_)
+            qpt_ = idt; // keep track of the first bin
 //        idt += qpt_;
 //        if (idt >= bins_.size()) { idt -= bins_.size(); } // is it relevant now ?
 //        assert (idt < bins_.size());
