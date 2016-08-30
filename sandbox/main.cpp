@@ -101,19 +101,23 @@ void bench_virtrual(){
     std::random_device rd;
     std::uniform_int_distribution<int> dist(0, 1);
 
-    interface<double> * p = NULL;
+    interface<double> * p1 = NULL;
+    interface<double> * p2 = NULL;
 
     double toto = rand();
     int random = dist(rd);
 
     std::priority_queue<double>  queue1;
-    std::priority_queue<double> queue2;
+    tool::sptq_queue<double> queue2;
 
     t1 = rdtsc();
-    if(random == 0)
+    if(random == 0){
         queue1.push(toto);
-    else
         queue2.push(toto);
+    }else{
+        queue1.push(toto);
+        queue2.push(toto);
+    }
     t2 = rdtsc();
 
     std::cout << "if " << t2 - t1 << std::endl;
@@ -121,13 +125,17 @@ void bench_virtrual(){
     random = dist(rd);
     toto = rand();
 
-    if(random == 0)
-        p = new dual_queue<std::priority_queue<double>>;
-    else
-        p = new dual_queue<std::priority_queue<double>>;
+    if(random == 0){
+        p1 = new dual_queue<std::priority_queue<double>>;
+        p2 = new dual_queue<tool::sptq_queue<double>>;
+    }else{
+        p1 = new dual_queue<tool::sptq_queue<double>>;
+        p2 = new dual_queue<std::priority_queue<double>>;
+    }
 
     t1 = rdtsc();
-    p->push(toto);
+    p1->push(toto);
+    p2->push(toto);
     t2 = rdtsc();
     std::cout << "virtual " << t2 - t1 << std::endl;
 }
