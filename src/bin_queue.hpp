@@ -9,6 +9,10 @@ namespace tool {
     of the bin is choosen by a kind of hash function (the hash give the bin "bucket").
     Into a bin with have a single link list using the "left" link of the node class.
 
+    the int qpt_ is an index of the first bin use, it is very usefeull for the top/pop
+    because if give a faster access to the last bin use which is potentially the current one
+    but not necessarely
+ 
     Objectively this queue is designed only for our problem because we are hashing "time"
     using the inverse of dt. Consequently, genericity with template is useless
 
@@ -68,7 +72,7 @@ namespace tool {
         void remove(tool::node<value_type>*);
     private:
         size_type size_;
-        int qpt_; // unused here
+        int qpt_; // index on the first bin use
         double dt_; // step times
         value_type tt_; // time at beginning of qpt_ interval
         std::vector<tool::node<value_type>* > bins_; // for correct resize

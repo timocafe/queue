@@ -26,7 +26,6 @@
 #include "serial_benchmark.h" //benchmark push/pop
 #include "parallel_benchmark.h" //benchmark mh //
 
-
 #include "tbb/tbb.h"
 
 namespace queue{
@@ -79,7 +78,62 @@ void benchmarks(int iteration = 10){
 
 }
 
+template<class T>
+struct interface{
+    virtual void push(T v) = 0;
+};
+
+template<class Q>
+struct dual_queue : public interface<typename Q::value_type>{
+    using queue_type = Q;
+    using value_type = typename queue_type::value_type;
+
+    void push(value_type v){
+        queue.push(v);
+    }
+
+    queue_type queue;
+};
+
+void bench_virtrual(){
+    unsigned long long int t1(0),t2(0);
+
+    std::random_device rd;
+    std::uniform_int_distribution<int> dist(0, 1);
+
+    interface<double> * p = NULL;
+
+    double toto = rand();
+    int random = dist(rd);
+
+    std::priority_queue<double>  queue1;
+    std::priority_queue<double> queue2;
+
+    t1 = rdtsc();
+    if(random == 0)
+        queue1.push(toto);
+    else
+        queue2.push(toto);
+    t2 = rdtsc();
+
+    std::cout << "if " << t2 - t1 << std::endl;
+
+    random = dist(rd);
+    toto = rand();
+
+    if(random == 0)
+        p = new dual_queue<std::priority_queue<double>>;
+    else
+        p = new dual_queue<std::priority_queue<double>>;
+
+    t1 = rdtsc();
+    p->push(toto);
+    t2 = rdtsc();
+    std::cout << "virtual " << t2 - t1 << std::endl;
+}
+
 int main(int argc, char* argv[]){
+    bench_virtrual();
     int rep = atoi(argv[1]);
     benchmarks(rep);
     return 0;

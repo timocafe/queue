@@ -10,7 +10,7 @@
 namespace queue{
 
 //pure mutex version, the queue can be whatever you want
-    template<class Q, class M = std::lock_guard<tool::QUEUE_MUTEX_TYPE>>
+template<class Q, class M = std::lock_guard<tool::QUEUE_MUTEX_TYPE>>
 struct concurent_priority_queue{
     typedef Q container_type;
     typedef typename Q::value_type value_type;
@@ -81,7 +81,7 @@ struct concurent_partial_lock_free_priority_queue{
     }
 
     bool dequeue(value_type& value,double t){
-        merge();
+     //   merge();
         bool b = (!queue.empty() && queue.top() <= t);
         if(b)
             queue.pop();
