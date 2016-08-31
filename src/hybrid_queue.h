@@ -47,13 +47,13 @@ struct concurent_priority_queue{
         if(iam(tid)) // I am myself push directly
             queue.push(value);
         else { /* I am not I am somebody else */
-            mutex_type lock(tool::mtx);
+            mutex_type lock(mtx);
             inter_buffer.push(value);
         }
     }
 
     void merge(){
-        mutex_type lock(tool::mtx); //lock guard pattern
+        mutex_type lock(mtx); //lock guard pattern
         while(!inter_buffer.empty()){
             value_type value = inter_buffer.top();
             queue.push(value);
@@ -75,6 +75,7 @@ struct concurent_priority_queue{
     container_type queue;
     std::size_t my_id;
     std::stack<value_type> inter_buffer;
+    tool::QUEUE_MUTEX_TYPE mtx;
 };
 
 // hybrid version where I use a lock free boost stack
@@ -95,7 +96,7 @@ struct concurent_partial_lock_free_priority_queue{
     }
 
     void merge(){
-        mutex_type lock(tool::mtx); //lock guard pattern
+        mutex_type lock(mtx); //lock guard pattern
         value_type value;
         while(inter_buffer.pop(value))
             queue.push(value);
@@ -115,6 +116,7 @@ struct concurent_partial_lock_free_priority_queue{
     container_type queue;
     std::size_t my_id;
     boost::lockfree::stack<double> inter_buffer;
+    tool::QUEUE_MUTEX_TYPE mtx;
 };
 
 // put lock free version

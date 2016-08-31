@@ -39,11 +39,9 @@ namespace tool{
         omp_lock_t omp_mtx;
     };
 
-    omp_mutex mtx; // global object
     typedef omp_mutex QUEUE_MUTEX_TYPE;
 #else
     typedef std::mutex QUEUE_MUTEX_TYPE;
-    std::mutex mtx;
 #endif
 
 } //end namespace

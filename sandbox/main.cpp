@@ -78,31 +78,8 @@ void benchmarks(int iteration = 10){
 
 }
 
-template<class T>
-struct interface{
-    virtual void push(T v) = 0;
-};
-
-template<class Q>
-struct dual_queue : public interface<typename Q::value_type>{
-    using queue_type = Q;
-    using value_type = typename queue_type::value_type;
-
-    void push(value_type v){
-        queue.push(v);
-    }
-
-    queue_type queue;
-};
-
-
-struct toto{
-    char merge(){}
-};
-
 int main(int argc, char* argv[]){
-    std::cout << sizeof(decltype(std::declval<toto>().merge())) << std::endl;
-//    int rep = atoi(argv[1]);
-//    benchmarks(rep);
+    int rep = atoi(argv[1]);
+    benchmarks(rep);
     return 0;
 }
