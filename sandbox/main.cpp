@@ -70,6 +70,7 @@ void benchmarks(int iteration = 10){
     using mh = queue::mhines_bench_helper;
     using mh_partial_lockfree  = queue::benchmark_partial_lockfree;
     //benchmarks
+//    queue::benchmark<push,t2>(iteration);
     queue::benchmark<push,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<pop,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<push_one,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);

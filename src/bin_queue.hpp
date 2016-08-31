@@ -28,7 +28,10 @@ namespace tool {
         // the first bin is 0
         inline explicit bin_queue(double dt = 0.025, value_type t0 = 0.):size_(0),qpt_(0),dt_(dt),tt_(t0)
                                                                              ,bins_(1024,NULL){}
-        ~bin_queue();
+        ~bin_queue(){
+            while(!empty())
+                pop();
+        };
 
         /** std::priority_queue API like */
         inline void push(value_type t){

@@ -54,9 +54,8 @@ public:
     }
 
     inline ~sptq_queue(){
-        tool::node<T> *n;
-        while((n = tool::spdeq(&(&q)->root)) != NULL)
-          delete n;
+        while(!empty())
+            pop();
     }
 
     inline void push(value_type value){

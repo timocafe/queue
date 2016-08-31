@@ -7,15 +7,6 @@
 namespace tool{
 
     template<class T>
-    bin_queue<T>::~bin_queue() {
-        tool::bin_node<T>* q, *q2;
-        for (q = first(); q; q = q2) {
-            q2 = next(q);
-            remove(q); /// Potentially dereferences freed pointer this->sptree_
-        }
-    }
-
-    template<class T>
     void bin_queue<T>::enqueue(T td, tool::bin_node<T>* q) {
 
         int rev_dt = 1/dt_;
@@ -25,9 +16,6 @@ namespace tool{
         assert(idt >= 0);
         if(idt < qpt_)
             qpt_ = idt; // keep track of the first bin
-//        idt += qpt_;
-//        if (idt >= bins_.size()) { idt -= bins_.size(); } // is it relevant now ?
-//        assert (idt < bins_.size());
         q->cnt_ = idt; // only for iteration
         q->left_ = bins_[idt];
         bins_[idt] = q;
