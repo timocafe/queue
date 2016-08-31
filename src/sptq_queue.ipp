@@ -164,7 +164,7 @@ node<T> * spenq( node<T>* n, SPTREE<T>* q ) {
     }
     else		/* difficult enq */
     {
-        key = n->key();
+        key = n->t_;
         left = n;
         right = n;
 
@@ -173,7 +173,7 @@ node<T> * spenq( node<T>* n, SPTREE<T>* q ) {
        note that the children will be reversed! */
 
     q->enqcmps++;
-        if(helper_comparator<T,Compare>::helper_comparator_one(next->key(), key))
+        if(helper_comparator<T,Compare>::helper_comparator_one(next->t_, key))
         goto two;
 
     one:	/* assert next->key <= key */
@@ -190,7 +190,7 @@ node<T> * spenq( node<T>* n, SPTREE<T>* q ) {
             }
 
         q->enqcmps++;
-            if(helper_comparator<T,Compare>::helper_comparator_one(temp->key(), key))
+            if(helper_comparator<T,Compare>::helper_comparator_one(temp->t_, key))
         {
                 left->right_ = next;
                 next->parent_ = left;
@@ -216,7 +216,7 @@ node<T> * spenq( node<T>* n, SPTREE<T>* q ) {
 
         q->enqcmps++;
 
-    } while(helper_comparator<T,Compare>::helper_comparator_two(next->key(), key));	/* change sides */
+    } while(helper_comparator<T,Compare>::helper_comparator_two(next->t_, key));	/* change sides */
 
     two:	/* assert next->key > key */
 
@@ -232,7 +232,7 @@ node<T> * spenq( node<T>* n, SPTREE<T>* q ) {
             }
 
         q->enqcmps++;
-            if(helper_comparator<T,Compare>::helper_comparator_two(temp->key(), key))
+            if(helper_comparator<T,Compare>::helper_comparator_two(temp->t_, key))
         {
                 right->left_ = next;
                 next->parent_ = right;
@@ -257,7 +257,7 @@ node<T> * spenq( node<T>* n, SPTREE<T>* q ) {
 
         q->enqcmps++;
 
-    } while(helper_comparator<T,Compare>::helper_comparator_one(next->key(), key));	/* change sides */
+    } while(helper_comparator<T,Compare>::helper_comparator_one(next->t_, key));	/* change sides */
 
         goto one;
 

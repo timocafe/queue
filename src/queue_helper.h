@@ -33,17 +33,24 @@ namespace tool { // namespace si better than C style
 
 //the node is too fat for the bin queue right and left useless
 template<class T>
+struct bin_node {
+    typedef T value_type;
+    explicit bin_node(value_type t = value_type()):t_(t),left_(0),cnt_(-1){};
+    value_type t_;
+    bin_node* left_;
+    int cnt_;
+};
+
+
+//the node is too fat for the bin queue right and left useless
+template<class T>
 struct node {
     typedef T value_type;
-
-    explicit node(value_type t = value_type()):t_(t),left_(0),right_(0),parent_(0),cnt_(-1){};
-    // remove the macro "key" now key() is function but I keep the MH notation
-    inline value_type key() { return t_;} const
+    explicit node(value_type t = value_type()):t_(t),left_(0),right_(0),parent_(0){};
 	value_type t_;
 	node* left_;
 	node* right_;
 	node* parent_;
-    int cnt_;
 };
 
 template<class T>

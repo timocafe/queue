@@ -76,7 +76,7 @@ public:
     inline value_type top(){
         value_type tmp = value_type();
         if(!empty())
-            tmp = tool::sphead<T>(&q)->key();
+            tmp = tool::sphead<T>(&q)->t_;
         return tmp;
     }
 
