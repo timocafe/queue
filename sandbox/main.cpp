@@ -74,7 +74,7 @@ void benchmarks(int iteration = 10){
     queue::benchmark<pop,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<push_one,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<mh,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
-//    queue::benchmark<mh_partial_lockfree,tp0,tp1,tp2>(iteration);
+    queue::benchmark<mh_partial_lockfree,tp0,tp1,tp2>(iteration);
 
 }
 
@@ -95,54 +95,14 @@ struct dual_queue : public interface<typename Q::value_type>{
     queue_type queue;
 };
 
-void bench_virtrual(){
-    unsigned long long int t1(0),t2(0);
 
-    std::random_device rd;
-    std::uniform_int_distribution<int> dist(0, 1);
-
-    interface<double> * p1 = NULL;
-    interface<double> * p2 = NULL;
-
-    double toto = rand();
-    int random = dist(rd);
-
-    std::priority_queue<double>  queue1;
-    tool::sptq_queue<double> queue2;
-
-    t1 = rdtsc();
-    if(random == 0){
-        queue1.push(toto);
-        queue2.push(toto);
-    }else{
-        queue1.push(toto);
-        queue2.push(toto);
-    }
-    t2 = rdtsc();
-
-    std::cout << "if " << t2 - t1 << std::endl;
-
-    random = dist(rd);
-    toto = rand();
-
-    if(random == 0){
-        p1 = new dual_queue<std::priority_queue<double>>;
-        p2 = new dual_queue<tool::sptq_queue<double>>;
-    }else{
-        p1 = new dual_queue<tool::sptq_queue<double>>;
-        p2 = new dual_queue<std::priority_queue<double>>;
-    }
-
-    t1 = rdtsc();
-    p1->push(toto);
-    p2->push(toto);
-    t2 = rdtsc();
-    std::cout << "virtual " << t2 - t1 << std::endl;
-}
+struct toto{
+    char merge(){}
+};
 
 int main(int argc, char* argv[]){
-    bench_virtrual();
-    int rep = atoi(argv[1]);
-    benchmarks(rep);
+    std::cout << sizeof(decltype(std::declval<toto>().merge())) << std::endl;
+//    int rep = atoi(argv[1]);
+//    benchmarks(rep);
     return 0;
 }

@@ -9,6 +9,31 @@
 
 namespace queue{
 
+
+// http://jguegant.github.io/blogs/tech/sfinae-introduction.html
+// Primary template, inherit from std::false_type.
+// ::value will return false.
+// Note: the second unused template parameter is set to default as void
+template <typename T, typename = void> //= std::void_t<> c++17
+struct has_merge : std::false_type{ // std::false_type equivalent const static bool value = false; inside the class
+};
+
+// Partial template specialisation, inherit from std::true_type.
+// ::value will return true.
+template <typename T>
+struct has_merge<T, decltype(std::declval<T>().merge())> : std::true_type{
+};
+
+// wrapper merge using the code defined up, if merge is defined in T it call it
+template <class T>
+typename std::enable_if<has_merge<T>::value>::type merge(T& obj){
+    return obj.merge();
+}
+
+// no merge we do nothing
+template <class T>
+typename std::enable_if<!has_merge<T>::value>::type merge(T& obj){} // nothing
+
 //pure mutex version, the queue can be whatever you want
 template<class Q, class M = std::lock_guard<tool::QUEUE_MUTEX_TYPE>>
 struct concurent_priority_queue{
@@ -81,7 +106,6 @@ struct concurent_partial_lock_free_priority_queue{
     }
 
     bool dequeue(value_type& value,double t){
-     //   merge();
         bool b = (!queue.empty() && queue.top() <= t);
         if(b)
             queue.pop();
