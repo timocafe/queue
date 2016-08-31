@@ -30,7 +30,7 @@ struct benchmark_partial_lockfree{
                 for(size_t i = 0; i < size; ++i)
                     v_queue.at(distribution_int(generator)).enqueue(tid,(t + distribution(generator))); //mixup my event + interevent
 
-                merge(v_queue.at(tid)); //SFINAE 
+                merge(v_queue.at(tid)); //SFINAE this is skiped for TBB queue version
 
                 while(v_queue.at(tid).dequeue(value,t))
 
