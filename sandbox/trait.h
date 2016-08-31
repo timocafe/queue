@@ -127,13 +127,13 @@ struct helper_parallel_type<concurrent_priority_queue>{
 
 template<>
 struct helper_parallel_type<priority_queue>{
-    typedef queue::concurent_priority_queue<helper_type<priority_queue>::value_type > value_type;
+    typedef queue::concurent_priority_queue<helper_type<bin_queue>::value_type > value_type;
     constexpr static auto name = "mutex_priority_queue";
 };
 
 template<>
 struct helper_parallel_type<concurrent_stack>{
-    typedef queue::concurent_partial_lock_free_priority_queue<helper_type<priority_queue>::value_type > value_type;
+    typedef queue::concurent_partial_lock_free_priority_queue<helper_type<bin_queue>::value_type > value_type;
     constexpr static auto name = "boost::concurrent_priority_queue";
 };
 
