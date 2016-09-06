@@ -14,15 +14,13 @@ namespace queue{
 // Primary template, inherit from std::false_type.
 // ::value will return false.
 // Note: the second unused template parameter is set to default as void
-template <typename T, typename = void> //= std::void_t<> c++17
-struct has_merge : std::false_type{ // std::false_type equivalent const static bool value = false; inside the class
-};
+template <typename T, typename = void> // default equivalent ... in C, catch every thing if nothing is found
+struct has_merge : std::false_type{}; // std::false_type equivalent const static bool value = false; inside the class
 
 // Partial template specialisation, inherit from std::true_type.
 // ::value will return true.
 template <typename T>
-struct has_merge<T, decltype(std::declval<T>().merge())> : std::true_type{
-};
+struct has_merge<T, decltype(std::declval<T>().merge())> : std::true_type{}; // ok I catch something or not else defaalt case
 
 // wrapper merge using the code defined up, if merge is defined in T it call it
 template <class T>
@@ -96,11 +94,7 @@ struct concurent_partial_lock_free_priority_queue{
     }
 
     void merge(){
-        mutex_type lock(mtx); //lock guard pattern
-        value_type value;
-        while(inter_buffer.pop(value))
-            queue.push(value);
-    }
+           }
 
     bool iam(std::size_t tid){
         return (tid == my_id);
@@ -125,7 +119,7 @@ struct concurent_lock_free_priority_queue{
     typedef Q container_type;
     typedef typename Q::value_type value_type;
 
-    void enqueue(size_t tid = 0, value_type value = 0){ // tid u
+    void enqueue(size_t tid = 0, value_type value = 0){ // tid useless
         queue.push(value);
     }
 

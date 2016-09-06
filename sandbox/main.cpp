@@ -70,7 +70,6 @@ void benchmarks(int iteration = 10){
     using mh = queue::mhines_bench_helper;
     using mh_partial_lockfree  = queue::benchmark_partial_lockfree;
     //benchmarks
-//    queue::benchmark<push,t2>(iteration);
     queue::benchmark<push,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<pop,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
     queue::benchmark<push_one,t0,t1,t2,t3,t4,t5,t6,t7>(iteration);
@@ -80,7 +79,18 @@ void benchmarks(int iteration = 10){
 }
 
 int main(int argc, char* argv[]){
-    int rep = atoi(argv[1]);
-    benchmarks(rep);
+//    int rep = atoi(argv[1]);
+//    benchmarks(rep);
+    tool::sptq_queue<double,std::greater<double> > q;
+    q.push(1);
+    q.push(9);
+    q.push(2);
+    q.push(501);
+    q.push(123);
+    q.push(235);
+    q.push(2);
+    q.push(-1);
+    q.push(0);
+    std::cout << q << std::endl;
     return 0;
 }
